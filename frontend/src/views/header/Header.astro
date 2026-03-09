@@ -1,0 +1,28 @@
+---
+const links = [
+    { url: "/", label: "EXPERIMENTAL FILMS" },
+    { url: "/about", label: "35MM PHOTOGRAPHY" },
+    { url: "/about", label: "GRADING" },
+    { url: "/about", label: "COMMERTIAL FILMS" },
+    { url: "/about", label: "ALL PROJECTS" }
+]
+const contact = [
+    { url: "/", label: "CONTACT" },
+    { url: "/about", label: "SOCIAL" },
+]
+---
+
+<nav class="fixed w-screen  px-16 py-4 top-0">
+    <div class="relative flex justify-between">
+ <ul class="">
+        { links.map((link) => (<li><a href={link.url}>{link.label}</a></li>))}
+        
+    </ul>
+    <ul class="">
+        { contact.map((link) => (<li><a href={link.url}>{link.label}</a></li>))}
+        
+    </ul>
+    <h5 class="absolute font-bold text-6xl top-[50%] left-[50%] -translate-[50%] tracking-tighter">FREDRICK DAGHARO</h5>
+    </div>
+   
+</nav>

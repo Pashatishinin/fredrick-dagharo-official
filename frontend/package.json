@@ -1,17 +1,23 @@
 {
-  "name": "frontend",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@fontsource/space-mono": "^5.2.9",
-    "@tailwindcss/vite": "^4.2.1",
-    "astro": "^5.17.1",
-    "tailwindcss": "^4.2.1"
-  }
+	"name": "frontend",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"check": "astro check",
+		"build:check": "astro build"
+	},
+	"dependencies": {
+		"@fontsource/space-mono": "^5.2.9",
+		"@tailwindcss/vite": "^4.2.1",
+		"astro": "^5.17.1",
+		"tailwindcss": "^4.2.1"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.7",
+		"typescript": "^5.9.3"
+	}
 }

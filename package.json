@@ -1,0 +1,34 @@
+{
+  "name": "fredrick-dagharo-official",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install",
+    "lint": "biome check --write",
+    "check-all": "npm run check --prefix frontend ",
+    "build:all": "npm run build --prefix frontend "
+  },
+  "lint-staged": {
+    "**/*.{js,ts,jsx,tsx,astro,json}": [
+      "biome check --staged --write"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pashatishinin/fredrick-dagharo-official.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Pashatishinin/fredrick-dagharo-official/issues"
+  },
+  "homepage": "https://github.com/Pashatishinin/fredrick-dagharo-official#readme",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.6",
+    "husky": "^8.0.0"
+  }
+}

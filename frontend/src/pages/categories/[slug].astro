@@ -1,0 +1,21 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { fetchHomeData } from "../../shared/fetch";
+import GallerySection from "../../views/home/gallery-section/GallerySection.astro";
+
+export async function getStaticPaths() {
+	const { categories } = await fetchHomeData();
+
+	return categories.map((category) => ({
+		params: { slug: category.slug || category.id },
+		props: { category },
+	}));
+}
+
+const { category } = Astro.props;
+const { slug } = Astro.params;
+---
+
+<Layout>
+  <GallerySection />
+</Layout>

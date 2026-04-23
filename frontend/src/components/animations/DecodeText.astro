@@ -1,0 +1,81 @@
+---
+interface Props {
+	duration?: number;
+	class?: string;
+	text?: string; // Можно передать текст пропсом или через слот
+}
+
+const { duration = 0.8, class: className, text } = Astro.props;
+---
+
+<button class={`decode-button ${className}`} data-duration={duration}>
+  <span class="decode-text">{text?.trim()}<slot /></span>
+</button>
+
+<script>
+  import { gsap } from "gsap";
+
+  const symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*?/";
+
+  const setupHoverAnimation = () => {
+    const buttons = document.querySelectorAll(".decode-button");
+
+    buttons.forEach((btn) => {
+      const textElement = btn.querySelector(".decode-text");
+      if (!textElement) return;
+
+      const finalWord = textElement.textContent?.trim() || "";
+      const duration = parseFloat(btn.getAttribute("data-duration") || "0.8");
+
+      let animation: gsap.core.Tween | null = null;
+
+      btn.addEventListener("mouseenter", () => {
+        if (animation) animation.kill();
+
+        let obj = { value: 0 };
+
+        animation = gsap.to(obj, {
+          value: finalWord.length,
+          duration: duration,
+          ease: "none",
+          onUpdate: () => {
+            const currentLen = Math.floor(obj.value);
+            const randomPart = Array(finalWord.length - currentLen)
+              .fill(0)
+              .map(() => symbols[Math.floor(Math.random() * symbols.length)])
+              .join("");
+
+            textElement.textContent =
+              finalWord.substring(0, currentLen) + randomPart;
+          },
+          onComplete: () => {
+            textElement.textContent = finalWord;
+          },
+        });
+      });
+    });
+  };
+
+  setupHoverAnimation();
+  document.addEventListener("astro:page-load", setupHoverAnimation);
+</script>
+
+<style>
+  .decode-button {
+    cursor: pointer;
+    background: transparent;
+    font-family: monospace;
+    display: inline-block;
+    line-height: 1;
+    color: #aaaaaa;
+  }
+
+  .decode-text {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+    white-space: pre;
+  }
+  .decode-button:hover {
+    color: #ffffff;
+  }
+</style>

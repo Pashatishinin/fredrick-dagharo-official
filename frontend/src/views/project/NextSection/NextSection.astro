@@ -1,0 +1,30 @@
+---
+import Card from "../../../components/common/Card/Card.astro";
+
+const nextProject = {
+	title: "PUMA x FREDRICK",
+	gif: "/projects/project_1.GIF",
+	isBig: false,
+	link: "/projects",
+};
+
+const previousProject = {
+	title: "PUMA x FREDRICK",
+	gif: "/projects/project_3.GIF",
+	isBig: false,
+	link: "/projects",
+};
+---
+
+<section class="flex justify-between py-16">
+  <div class="max-w-200">
+    <a href="/projects">
+      <Card subTitle="Previous Project" right data={previousProject} />
+    </a>
+  </div>
+  <div class="max-w-200">
+    <a href="/projects">
+      <Card subTitle="Next Project" data={nextProject} />
+    </a>
+  </div>
+</section>

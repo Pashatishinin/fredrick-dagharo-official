@@ -1,0 +1,74 @@
+---
+interface Props {
+	animateOnScroll?: boolean;
+	delay?: number;
+	start?: string;
+	className?: string;
+}
+
+const { animateOnScroll = true, delay = 0, start = "top 80%", className = "" } = Astro.props;
+---
+
+<div
+  class={`text-effect-container ${className}`}
+  data-animate={animateOnScroll}
+  data-delay={delay}
+  data-start={start}
+  style="visibility: visible; position: relative;"
+>
+  <slot />
+</div>
+
+<style>
+  :global(.line-mask) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+  import { SplitText } from "gsap/SplitText";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger, SplitText);
+
+  function initAnimations() {
+    const containers = document.querySelectorAll(".text-effect-container");
+
+    containers.forEach((container) => {
+      const target =
+        container.querySelector("h1, h2, h3, p, span") || container;
+      const delay = parseFloat(container.getAttribute("data-delay") || "0");
+      const start = container.getAttribute("data-start") || "top 80%";
+
+      const maskSplit = new SplitText(target, {
+        type: "lines",
+        linesClass: "line-mask",
+      });
+
+      const textSplit = new SplitText(maskSplit.lines, {
+        type: "lines",
+      });
+
+      gsap.from(textSplit.lines, {
+        yPercent: 100,
+        autoAlpha: 0,
+        stagger: 0.08,
+        duration: 0.8,
+        ease: "power3.out",
+        delay: delay,
+        scrollTrigger: {
+          trigger: target,
+          start: start,
+          once: true,
+        },
+      });
+    });
+  }
+
+  document.fonts.ready.then(() => {
+    initAnimations();
+  });
+
+  document.addEventListener("astro:after-swap", initAnimations);
+</script>

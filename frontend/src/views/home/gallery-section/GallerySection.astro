@@ -1,8 +1,142 @@
 ---
+import DecodeText from "../../../components/animations/DecodeText.astro";
 import Card from "../../../components/common/Card/Card.astro";
+import { fetchHomeData } from "../../../shared/fetch";
+
+const bigItems = [6, 11];
+const { categories } = await fetchHomeData();
+
+const data = [
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_4.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: true,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_4.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: true,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_4.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+];
 ---
 
-<section class="w-screen h-screen flex items-center justify-center gap-7">
-    {[1,2].map((item) => (<Card/>))}
-    
+<section class="w-full px-16 py-30">
+  <div>
+    <ul class="">
+      <li>
+        <a href="/"
+          ><DecodeText duration={1} class="my-custom-style"
+            >ALL PROJECTS</DecodeText
+          ></a
+        >
+      </li>
+      {
+        categories.map((category) => (
+          <li>
+            <a href={`/categories/${category.slug}`}>
+              <DecodeText duration={1} class="my-custom-style">
+                {category.title.toUpperCase()}
+              </DecodeText>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div
+    class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 py-4 grid-flow-dense"
+  >
+    {
+      data.map((item, index) => {
+        return (
+          <div class={item.isBig ? "sm:col-span-2 sm:row-span-2" : ""}>
+            <a href={item.link}>
+              <Card number={index} isBig={item.isBig} data={item} />
+            </a>
+          </div>
+        );
+      })
+    }
+  </div>
 </section>

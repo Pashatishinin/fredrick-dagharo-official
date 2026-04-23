@@ -1,0 +1,53 @@
+---
+import DecodeText from "../../components/animations/DecodeText.astro";
+---
+
+<section class="h-full px-16 py-30 w-full">
+  <div class="grid grid-cols-3 gap-8">
+    <div class="text-6xl font-black tracking-tighter">
+      <a href="/">
+        <h1>FREDRICK</h1>
+        <h1>DAGNARO</h1>
+      </a>
+    </div>
+    <div class="py-4">
+      <h1 class="text-sm">SOCIAL</h1>
+      <ul>
+        <li class="text-xl">
+          <DecodeText duration={2} class="my-custom-style">INSTAGRAM</DecodeText
+          >
+        </li>
+
+        <li class="text-xl">
+          <DecodeText duration={2} class="my-custom-style">VIMEO</DecodeText>
+        </li>
+        <li class="text-xl">
+          <DecodeText duration={2} class="my-custom-style">LINKEDIN</DecodeText>
+        </li>
+      </ul>
+    </div>
+    <div class="py-4">
+      <h1 class="text-sm">SITEMAP</h1>
+      <ul>
+        <li class="text-xl">
+          <a href="/">
+            <DecodeText duration={2} class="my-custom-style">HOME</DecodeText>
+          </a>
+        </li>
+
+        <li class="text-xl">
+          <a href="/">
+            <DecodeText duration={2} class="my-custom-style">ABOUT</DecodeText>
+          </a>
+        </li>
+        <li class="text-xl">
+          <a href="/"
+            ><DecodeText duration={2} class="my-custom-style"
+              >CONTACT</DecodeText
+            ></a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

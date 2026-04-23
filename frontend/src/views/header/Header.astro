@@ -1,28 +1,44 @@
 ---
-const links = [
-	{ url: "/", label: "EXPERIMENTAL FILMS" },
-	{ url: "/about", label: "35MM PHOTOGRAPHY" },
-	{ url: "/about", label: "GRADING" },
-	{ url: "/about", label: "COMMERTIAL FILMS" },
-	{ url: "/about", label: "ALL PROJECTS" },
-];
+import { callSafely } from "astro:actions";
+import DecodeText from "../../components/animations/DecodeText.astro";
+import Clock from "../../components/common/Clock.astro";
+import { fetchHomeData } from "../../shared/fetch";
+
+const { categories } = await fetchHomeData();
 const contact = [
+	{ url: "/", label: "ABOUT" },
 	{ url: "/", label: "CONTACT" },
-	{ url: "/about", label: "SOCIAL" },
 ];
 ---
 
-<nav class="fixed w-screen  px-16 py-4 top-0">
-    <div class="relative flex justify-between">
- <ul class="">
-        { links.map((link) => (<li><a href={link.url}>{link.label}</a></li>))}
-        
-    </ul>
-    <ul class="">
-        { contact.map((link) => (<li><a href={link.url}>{link.label}</a></li>))}
-        
-    </ul>
-    <h5 class="absolute font-bold text-6xl top-[50%] left-[50%] -translate-[50%] tracking-tighter">FREDRICK DAGHARO</h5>
+<nav class="fixed w-full px-16 py-4 top-0 z-9999 max-w-[1920px]">
+  <div class="relative flex justify-between">
+    <div>
+      <a href="/">
+        <h5 class="font-bold text-xl tracking-tighter leading-[90%]">
+          FREDRICK
+        </h5>
+        <h5 class="font-bold text-xl tracking-tighter leading-[90%]">
+          DAGHARO
+        </h5>
+      </a>
     </div>
-   
+
+    <ul class="flex gap-8">
+      {
+        contact.map((link) => (
+          <li>
+            <a href={link.url}>
+              <DecodeText duration={2} class="my-custom-style">
+                {link.label}
+              </DecodeText>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="text-[10px] font-medium opacity-60">
+      <Clock />
+    </div>
+  </div>
 </nav>

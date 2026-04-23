@@ -30,5 +30,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.6",
     "husky": "^8.0.0"
+  },
+  "dependencies": {
+    "@fontsource/space-grotesk": "^5.2.10"
   }
 }

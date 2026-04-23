@@ -1,0 +1,121 @@
+---
+// В Astro нам не нужен "use client", скрипты ниже и так выполнятся в браузере
+---
+
+<div id="custom-cursor-dot" class="cursor-dot"></div>
+<div id="custom-cursor-outline" class="cursor-outline">
+  <span class="cursor-text">PLAY</span>
+</div>
+
+<script>
+  import { gsap } from "gsap";
+
+  const initCursor = () => {
+    const dot = document.getElementById("custom-cursor-dot");
+    const outline = document.getElementById("custom-cursor-outline");
+    const cursorText = document.querySelector(".cursor-text") as HTMLElement;
+    const links = document.querySelectorAll("a, .open-cursor, button, .view");
+
+    if (window.innerWidth < 700 || !dot || !outline) return;
+
+    window.addEventListener("mousemove", (e) => {
+      const { clientX, clientY } = e;
+
+      gsap.to(dot, {
+        x: clientX,
+        y: clientY,
+        duration: 0.1,
+      });
+
+      gsap.to(outline, {
+        x: clientX,
+        y: clientY,
+        duration: 0.5,
+        ease: "power2.out",
+      });
+    });
+
+    links.forEach((link) => {
+      link.addEventListener("mouseenter", (e) => {
+        const target = e.currentTarget as HTMLElement;
+
+        if (target.classList.contains("view")) {
+          gsap.to(outline, {
+            scale: 2.5,
+            backgroundColor: "white",
+            border: "none",
+            duration: 0.3,
+          });
+          gsap.to(dot, { opacity: 0, duration: 0.2 });
+          if (cursorText)
+            gsap.to(cursorText, { opacity: 1, color: "black", duration: 0.3 });
+        } else {
+          gsap.to(outline, { scale: 1.5, duration: 0.3 });
+          gsap.to(dot, { scale: 0.5, duration: 0.3 });
+        }
+      });
+
+      link.addEventListener("mouseleave", () => {
+        gsap.to(outline, {
+          scale: 1,
+          backgroundColor: "transparent",
+          border: "1px solid rgba(255, 255, 255, 0.5)",
+          duration: 0.3,
+        });
+        gsap.to(dot, { opacity: 1, scale: 1, duration: 0.3 });
+        if (cursorText) gsap.to(cursorText, { opacity: 0, duration: 0.3 });
+      });
+    });
+  };
+
+  initCursor();
+  document.addEventListener("astro:page-load", initCursor);
+</script>
+
+<style>
+  .cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background-color: white;
+    border-radius: 50%;
+    z-index: 100000;
+    pointer-events: none;
+    mix-blend-mode: difference;
+    transform: translate(-50%, -50%);
+  }
+
+  .cursor-outline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    z-index: 99999;
+    pointer-events: none;
+    mix-blend-mode: difference;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+  }
+
+  .cursor-text {
+    font-size: 5px;
+    text-transform: uppercase;
+    opacity: 0;
+    color: white;
+    font-family: monospace;
+  }
+
+  @media (max-width: 700px) {
+    .cursor-dot,
+    .cursor-outline {
+      display: none;
+    }
+  }
+</style>

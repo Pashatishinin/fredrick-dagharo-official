@@ -1,0 +1,43 @@
+<div class="flex flex-col items-end uppercase">
+  <span id="current-time">00:00:00</span>
+  <span id="current-location">Loading location...</span>
+</div>
+
+<script>
+  import { createPerfTracker } from "../../shared/test/perf";
+
+  const locationPerf = createPerfTracker("📍 Location Update");
+  const renderPerf = createPerfTracker("⏱ Full Render");
+
+  function updateTime() {
+    const timeElement = document.getElementById("current-time");
+    if (timeElement) {
+      timeElement.innerText = new Date().toLocaleTimeString("en-GB", {
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    }
+  }
+
+  function getLocation() {
+    locationPerf.start();
+    const locElement = document.getElementById("current-location");
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const offset = -new Date().getTimezoneOffset() / 60;
+    const gmtDisplay = `GMT${offset >= 0 ? "+" : ""}${offset}`;
+
+    if (locElement) {
+      locElement.innerText = `${timeZone} (${gmtDisplay})`;
+    }
+
+    locationPerf.end();
+  }
+
+  renderPerf.start();
+  setInterval(updateTime, 1000);
+  updateTime();
+  getLocation();
+  renderPerf.end();
+</script>

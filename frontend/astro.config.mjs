@@ -21,11 +21,7 @@ export default defineConfig({
     },
     plugins: [tailwindcss()],
     ssr: {
-      noExternal: [
-        "gsap",
-        "@fontsource/space-mono",
-        "@fontsource/space-grotesk",
-      ],
+      noExternal: ["gsap"],
     },
     optimizeDeps: {
       include: ["gsap", "gsap/ScrollTrigger"],

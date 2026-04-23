@@ -25,5 +25,10 @@
 	"devDependencies": {
 		"@astrojs/check": "^0.9.7",
 		"typescript": "^5.9.3"
+	},
+	"pnpm": {
+		"overrides": {
+			"vite": "^6.0.0"
+		}
 	}
 }

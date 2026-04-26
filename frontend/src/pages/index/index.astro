@@ -1,0 +1,158 @@
+---
+import DecodeText from "../../components/animations/DecodeText.astro";
+import MainLayout from "../../layouts/MainLayout.astro";
+
+const categories = [
+	{ url: "/", title: "FILMS" },
+	{ url: "/photography", title: "PHOTOGRAPHY" },
+];
+
+const data = [
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_4.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_4.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_4.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		gif: "/projects/project_3.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+];
+---
+
+<MainLayout>
+  <section class="p-16">
+    <div>
+      <ul class="">
+        <li>
+          <a href="/"
+            ><DecodeText duration={1} class="my-custom-style"
+              >ALL PROJECTS</DecodeText
+            ></a
+          >
+        </li>
+        {
+          categories.map((category) => (
+            <li>
+              <a href={`/categories/${category}`}>
+                <DecodeText duration={1} class="my-custom-style">
+                  {category.title.toUpperCase()}
+                </DecodeText>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="grid grid-cols-2 gap-x-16 gap-y-4 py-16">
+      {
+        data.map((item, index) => (
+          <div class="group cursor-pointer relative isolation-auto">
+            <div class="grid grid-cols-6 gap-8 relative z-30">
+              <p class="col-span-1 text-[12px]">
+                [{(index + 1).toString().padStart(2, "0")}]
+              </p>
+              <div class="col-span-3 text-[12px]">
+                <DecodeText client:visible duration={1}>
+                  {item.title}
+                </DecodeText>
+              </div>
+              <p class="col-span-1 text-[12px]">FILMS</p>
+              <p class="col-span-1 text-[12px]">2026</p>
+            </div>
+
+            <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <img
+                src={item.gif}
+                alt={item.title}
+                class="w-[500px] h-auto object-cover"
+              />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</MainLayout>

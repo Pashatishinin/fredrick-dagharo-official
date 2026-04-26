@@ -1,5 +1,6 @@
 import { category } from "./category";
+import { films } from "./films";
 import { loader } from "./loader";
-import { project } from "./project";
+import { photography } from "./photography";
 
-export const schemaTypes = [project, category, loader];
+export const schemaTypes = [category, loader, films, photography];

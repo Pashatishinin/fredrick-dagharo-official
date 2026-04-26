@@ -2,6 +2,7 @@
 import Header from "../views/header/Header.astro";
 
 import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import CustomCursor from "../components/ui/CustomCursor.astro";
 import Loader from "../components/ui/loader/Loader.astro";
 import Footer from "../views/footer/Footer.astro";
@@ -16,7 +17,7 @@ import Footer from "../views/footer/Footer.astro";
     <link rel="stylesheet" href="https://use.typekit.net/bef2bdy.css" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
-
+    <ClientRouter />
     <title>Astro Basics</title>
   </head>
   <body>
@@ -28,6 +29,23 @@ import Footer from "../views/footer/Footer.astro";
 </html>
 
 <style>
+  ::view-transition-old(root) {
+    animation: none;
+    z-index: 1;
+  }
+  ::view-transition-new(root) {
+    z-index: 2;
+    animation: slide-up 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
   html,
   body {
     /* width: 100%; */

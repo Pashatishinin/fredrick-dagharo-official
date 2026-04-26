@@ -6,12 +6,14 @@ import { fetchHomeData } from "../../shared/fetch";
 
 const { categories } = await fetchHomeData();
 const contact = [
+	{ url: "/index", label: "INDEX" },
+	{ url: "/", label: "FILMS" },
+	{ url: "/photography", label: "PHOTOGRAPHY" },
 	{ url: "/", label: "ABOUT" },
-	{ url: "/", label: "CONTACT" },
 ];
 ---
 
-<nav class="fixed w-full px-16 py-4 top-0 z-9999 max-w-[1920px]">
+<header class="header fixed w-full px-16 py-4 top-0 z-9999 max-w-[1920px]">
   <div class="relative flex justify-between">
     <div>
       <a href="/">
@@ -41,4 +43,10 @@ const contact = [
       <Clock />
     </div>
   </div>
-</nav>
+</header>
+
+<style>
+  header {
+    z-index: 99999;
+  }
+</style>

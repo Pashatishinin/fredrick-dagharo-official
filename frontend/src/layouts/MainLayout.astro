@@ -1,7 +1,7 @@
 ---
 import Header from "../views/header/Header.astro";
-
 import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
 import CustomCursor from "../components/ui/CustomCursor.astro";
 import Loader from "../components/ui/loader/Loader.astro";
 import Footer from "../views/footer/Footer.astro";
@@ -18,13 +18,31 @@ import Footer from "../views/footer/Footer.astro";
     <meta name="generator" content={Astro.generator} />
 
     <script src="../shared/lib/gsap-init.ts"></script>
+    <ClientRouter />
     <title>Astro Basics</title>
+
+    <script is:inline>
+      function initLoaderState() {
+        const hasLoaded = sessionStorage.getItem("hasLoaded");
+        if (hasLoaded === "true") {
+          document.documentElement.classList.add("loader-visited");
+          window.HERO_DELAY = 0.2;
+        } else {
+          window.HERO_DELAY = 3.5; // Время работы вашего лоадера
+        }
+      }
+      initLoaderState();
+
+      document.addEventListener("astro:after-swap", () => {
+        document.documentElement.classList.add("loader-visited");
+        window.HERO_DELAY = 0.2;
+      });
+    </script>
   </head>
   <body>
     <Loader />
     <CustomCursor />
-    <main id="main-content" style="opacity: 0;">
-      <!-- <main id="main-content" style=""> -->
+    <main id="main-content">
       <Header />
       <slot />
       <Footer />
@@ -32,20 +50,93 @@ import Footer from "../views/footer/Footer.astro";
   </body>
 </html>
 
-<style>
+<style is:global>
+  /* Если лоадер уже был — скрываем его мгновенно через CSS */
+  .loader-visited #loader {
+    display: none !important;
+  }
+
+  /* Если лоадер уже был — контент виден сразу */
+  .loader-visited #main-content {
+    opacity: 1 !important;
+  }
+
+  /* Начальное состояние для первого захода */
+  #main-content {
+    opacity: 0;
+  }
+
+  /* Ваши стили переходов */
+  ::view-transition-old(root) {
+    animation: none;
+    z-index: 1;
+  }
+  ::view-transition-new(root) {
+    z-index: 2;
+    animation: slide-up 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
   html,
   body {
     margin: 0;
     width: 100%;
-    /* height: 100%; */
     min-height: 100%;
     background-color: #010101;
     color: #ebebeb;
     max-width: 1920px;
     margin: auto;
-  }
-  body {
-    /* font-family: "Space Mono", monospace; */
     font-family: "Space Grotesk", sans-serif;
   }
 </style>
+
+<script>
+  import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+  import { gsap } from "gsap";
+
+  function handleLoader() {
+    const loader = document.getElementById("loader");
+    const mainContent = document.getElementById("main-content");
+
+    // Если класса loader-visited нет — запускаем анимацию
+    if (!document.documentElement.classList.contains("loader-visited")) {
+      if (loader && mainContent) {
+        const tl = gsap.timeline({
+          onComplete: () => {
+            sessionStorage.setItem("hasLoaded", "true");
+            document.documentElement.classList.add("loader-visited");
+            loader.style.display = "none";
+          },
+        });
+
+        // Длительность соответствует задержке (HERO_DELAY)
+        tl.to(loader, { opacity: 0, duration: 0.8, delay: 2.5 }).to(
+          mainContent,
+          { opacity: 1, duration: 0.5 },
+          "-=0.4",
+        );
+      }
+    }
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    handleLoader();
+
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 650);
+  });
+
+  document.addEventListener("astro:before-preparation", () => {
+    ScrollTrigger.getAll().forEach((t) => t.kill());
+    gsap.killTweensOf("*");
+  });
+</script>

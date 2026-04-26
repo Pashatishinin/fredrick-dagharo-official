@@ -21,6 +21,7 @@ export const initParallax = (element: HTMLElement, yPercentValue: number = 20) =
 		{
 			yPercent: yPercentValue,
 			ease: "none",
+			overwrite: true,
 			scrollTrigger: {
 				trigger: container,
 				start: "top bottom",
@@ -28,6 +29,7 @@ export const initParallax = (element: HTMLElement, yPercentValue: number = 20) =
 				scrub: true,
 				// markers: true,
 				invalidateOnRefresh: true,
+				anticipatePin: 1,
 			},
 		},
 	);

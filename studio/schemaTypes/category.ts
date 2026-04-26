@@ -22,5 +22,16 @@ export const category = defineType({
 			},
 			validation: (Rule) => Rule.required(),
 		}),
+		{
+			name: "type",
+			title: "Тип категории",
+			type: "string",
+			options: {
+				list: [
+					{ title: "Films", value: "films" },
+					{ title: "Photography", value: "photography" },
+				],
+			},
+		},
 	],
 });

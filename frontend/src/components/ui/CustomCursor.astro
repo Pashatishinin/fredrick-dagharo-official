@@ -4,7 +4,8 @@
 
 <div id="custom-cursor-dot" class="cursor-dot"></div>
 <div id="custom-cursor-outline" class="cursor-outline">
-  <span class="cursor-text">PLAY</span>
+  <span class="cursor-text cursor-play">[ PLAY ]</span>
+  <span class="cursor-text cursor-close">[ CLOSE ]</span>
 </div>
 
 <script>
@@ -13,61 +14,124 @@
   const initCursor = () => {
     const dot = document.getElementById("custom-cursor-dot");
     const outline = document.getElementById("custom-cursor-outline");
-    const cursorText = document.querySelector(".cursor-text") as HTMLElement;
-    const links = document.querySelectorAll("a, .open-cursor, button, .view");
+    const playText = document.querySelector(".cursor-play") as HTMLElement;
+    const closeText = document.querySelector(".cursor-close") as HTMLElement;
 
     if (window.innerWidth < 700 || !dot || !outline) return;
 
+    const hideCursorCompletely = () => {
+      gsap.to([dot, outline], {
+        scale: 0,
+        opacity: 0,
+        duration: 0.2,
+        overwrite: true, // Важно: прерываем другие анимации
+      });
+    };
+
+    const resetCursor = () => {
+      gsap.to(outline, {
+        scale: 1,
+        opacity: 1,
+        backgroundColor: "transparent", // Фон всегда прозрачный
+        border: "1px solid rgba(255, 255, 255, 0.5)",
+        duration: 0.3,
+        overwrite: true,
+      });
+      gsap.to(dot, { opacity: 1, scale: 1, duration: 0.3 });
+      if (playText) gsap.to(playText, { opacity: 0, duration: 0.3 });
+      if (closeText) gsap.to(closeText, { opacity: 0, duration: 0.3 });
+    };
+
     window.addEventListener("mousemove", (e) => {
       const { clientX, clientY } = e;
+      const target = e.target as HTMLElement;
 
-      gsap.to(dot, {
-        x: clientX,
-        y: clientY,
-        duration: 0.1,
-      });
-
+      gsap.to(dot, { x: clientX, y: clientY, duration: 0.1 });
       gsap.to(outline, {
         x: clientX,
         y: clientY,
-        duration: 0.5,
+        duration: 0.4,
         ease: "power2.out",
       });
-    });
 
-    links.forEach((link) => {
-      link.addEventListener("mouseenter", (e) => {
-        const target = e.currentTarget as HTMLElement;
+      const modal = document.querySelector(".video-modal.is-open");
 
-        if (target.classList.contains("view")) {
+      if (modal) {
+        const isOverVideo = !!target.closest(".video-container");
+        const isOverCloseBtn = !!target.closest(".close-modal");
+
+        if (isOverVideo) {
+          hideCursorCompletely();
+        } else if (!isOverCloseBtn) {
           gsap.to(outline, {
             scale: 2.5,
-            backgroundColor: "white",
-            border: "none",
+            opacity: 1,
+            backgroundColor: "transparent",
+            border: "1px solid transparent",
             duration: 0.3,
           });
-          gsap.to(dot, { opacity: 0, duration: 0.2 });
-          if (cursorText)
-            gsap.to(cursorText, { opacity: 1, color: "black", duration: 0.3 });
+          gsap.to(dot, { scale: 0, opacity: 0, duration: 0.2 });
+          if (closeText)
+            gsap.to(closeText, { opacity: 1, color: "white", duration: 0.3 });
+          if (playText) gsap.to(playText, { opacity: 0, duration: 0.1 });
         } else {
-          gsap.to(outline, { scale: 1.5, duration: 0.3 });
-          gsap.to(dot, { scale: 0.5, duration: 0.3 });
+          resetCursor();
         }
-      });
+      }
+    });
 
-      link.addEventListener("mouseleave", () => {
+    // --- КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ ---
+    // Добавляем слушатель на весь документ, чтобы отловить момент входа в iframe
+    document.addEventListener("mouseover", (e) => {
+      const target = e.target as HTMLElement;
+
+      // 1. Если мы зашли в зону видео — прячем курсор принудительно
+      if (target.closest(".video-container")) {
+        hideCursorCompletely();
+      }
+
+      // 2. Логика PLAY для карточек
+      const isModalOpen = !!document.querySelector(".video-modal.is-open");
+
+      const isOverHeader =
+        !!target.closest("header") || !!target.closest(".header");
+
+      if (target.closest(".view") && !isModalOpen) {
         gsap.to(outline, {
-          scale: 1,
+          scale: 2.5,
+          opacity: 1,
           backgroundColor: "transparent",
-          border: "1px solid rgba(255, 255, 255, 0.5)",
+          border: "1px solid transparent",
           duration: 0.3,
         });
-        gsap.to(dot, { opacity: 1, scale: 1, duration: 0.3 });
-        if (cursorText) gsap.to(cursorText, { opacity: 0, duration: 0.3 });
-      });
+        gsap.to(dot, { scale: 0, opacity: 0, duration: 0.2 });
+        if (playText)
+          gsap.to(playText, { opacity: 1, color: "white", duration: 0.3 });
+      }
+    });
+
+    // Если мышь уходит с видео обратно на модалку — возвращаем CLOSE
+    document.addEventListener("mouseout", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest(".video-container")) {
+        // Мы не вызываем resetCursor здесь, потому что mousemove на фоне модалки
+        // сам подхватит управление и включит CLOSE.
+      }
+      if (target.closest(".view")) {
+        resetCursor();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.classList.contains("video-modal") ||
+        target.classList.contains("close-modal")
+      ) {
+        resetCursor();
+      }
     });
   };
-
   initCursor();
   document.addEventListener("astro:page-load", initCursor);
 </script>
@@ -81,7 +145,6 @@
     height: 6px;
     background-color: white;
     border-radius: 50%;
-    z-index: 100000;
     pointer-events: none;
     mix-blend-mode: difference;
     transform: translate(-50%, -50%);
@@ -95,7 +158,6 @@
     height: 30px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 50%;
-    z-index: 99999;
     pointer-events: none;
     mix-blend-mode: difference;
     display: flex;
@@ -104,7 +166,15 @@
     transform: translate(-50%, -50%);
   }
 
+  .cursor-dot {
+    z-index: 1000001;
+  }
+  .cursor-outline {
+    z-index: 1000000;
+  }
+
   .cursor-text {
+    position: absolute;
     font-size: 5px;
     text-transform: uppercase;
     opacity: 0;

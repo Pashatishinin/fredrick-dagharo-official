@@ -1,0 +1,290 @@
+---
+import { Vimeo } from "@astro-community/astro-embed-vimeo";
+---
+
+<div
+  class="video-project-card group relative w-full min-h-screen overflow-hidden"
+>
+  <div
+    class="video-modal fixed inset-0 z-[100] flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-300"
+  >
+    <!-- <button
+      class="close-modal absolute top-5 right-5 text-white text-4xl z-[110] cursor-pointer"
+      >&times;</button
+    > -->
+
+    <div
+      class="video-container relative w-[90vw] aspect-video max-w-6xl shadow-2xl"
+    >
+      <div class="cursor-tracker absolute inset-0 z-[50]"></div>
+
+      <Vimeo
+        id="https://vimeo.com/392460230"
+        params="controls=1&muted=0&autoplay=0"
+      />
+    </div>
+  </div>
+  <div
+    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
+  >
+    <h1 class="text-7xl font-black -tracking-widest">PUMA x FREDRICK</h1>
+  </div>
+
+  <img
+    src="/image.jpg"
+    alt="Project Cover"
+    class="view parallax-element absolute top-0 left-0 w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
+  />
+</div>
+
+<style is:global>
+  .video-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    height: 90vh !important;
+    width: calc(90vh * 1.77777778) !important;
+
+    max-width: 90vw;
+    max-height: calc(90vw * 0.5625);
+
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .video-wrapper [data-vimeo-embed],
+  .video-wrapper lite-vimeo {
+    padding-top: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+  }
+
+  .video-wrapper iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+
+    object-fit: cover;
+  }
+
+  .video-container [data-vimeo-embed],
+  .video-container lite-vimeo,
+  .video-container iframe {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+  }
+
+  .video-container::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none; /* Это позволит кликать сквозь слой, но поможет браузеру не "терять" мышь */
+  }
+
+  /* Состояние когда модалка открыта */
+  .video-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cursor-tracker {
+    pointer-events: none; /* Чтобы можно было нажимать на кнопки плеера под ним */
+  }
+
+  .view {
+    pointer-events: auto !important;
+    z-index: 20; /* Поднимем чуть выше оберток */
+  }
+</style>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+
+  import { initParallax } from "../../../shared/animation/parallax";
+  import Player from "@vimeo/player";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function setupParallax() {
+    const elements = document.querySelectorAll(
+      ".parallax-element:not(.initialised)",
+    );
+
+    elements.forEach((el) => {
+      if (el instanceof HTMLElement) {
+        initParallax(el, 20);
+        el.classList.add("initialised");
+      }
+    });
+
+    ScrollTrigger.refresh();
+  }
+
+  //   function initProjectCard() {
+  //     const containers = document.querySelectorAll(".group");
+
+  //     containers.forEach((container) => {
+  //       const img = container.querySelector(".view") as HTMLElement;
+  //       if (!img) return;
+
+  //       if (!img.classList.contains("initialised")) {
+  //         initParallax(img, 20);
+  //         img.classList.add("initialised");
+  //       }
+
+  //       img.onclick = () => {
+  //         img.style.display = "none";
+
+  //         const iframe = container.querySelector("iframe");
+  //         if (iframe) {
+  //           const player = new Player(iframe);
+
+  //           player.ready().then(() => {
+  //             player.play().catch((error) => {
+  //               console.error("Видео не смогло запуститься:", error);
+
+  //               player.setMuted(true);
+  //               player.play();
+  //             });
+  //           });
+  //         }
+  //       };
+  //     });
+  //   }
+
+  //   initProjectCard();
+  //   document.addEventListener("astro:page-load", initProjectCard);
+
+  function initProjectCard() {
+    const containers = document.querySelectorAll(".video-project-card");
+
+    containers.forEach((container) => {
+      if (container.classList.contains("js-initialized")) return;
+
+      const img = container.querySelector(".view") as HTMLElement;
+      const modal = container.querySelector(".video-modal") as HTMLElement;
+      const vimeoWrapper = container.querySelector(".video-container"); // Родитель для видео
+      const closeBtn = container.querySelector(".close-modal") as HTMLElement;
+
+      if (!img || !modal || !vimeoWrapper) return;
+
+      let player: Player | null = null;
+
+      // Функция для получения плеера (создаем один раз при клике)
+      const getPlayer = () => {
+        if (player) return player;
+
+        // Ищем iframe (он может появиться после рендера lite-vimeo)
+        const iframe = vimeoWrapper.querySelector("iframe");
+        if (iframe) {
+          player = new Player(iframe);
+        } else {
+          // Если iframe еще нет (lite-vimeo еще не подгрузил его),
+          // инициируем через родительский элемент, но это может быть нестабильно.
+          // Самый надежный способ - найти lite-vimeo и взять его ID
+          const liteVimeo = vimeoWrapper.querySelector("lite-vimeo");
+          if (liteVimeo) {
+            // @ts-ignore
+            const videoId = liteVimeo.getAttribute("videoid") || "392460230";
+            player = new Player(liteVimeo as HTMLElement, {
+              id: videoId,
+              responsive: true,
+            });
+          }
+        }
+        return player;
+      };
+
+      // Открытие
+      img.addEventListener("click", (e) => {
+        e.preventDefault();
+        modal.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+
+        const p = getPlayer();
+        if (p) {
+          p.play().catch(() => {
+            // Если автоплей заблокирован, пробуем включить звук и играть
+            p.setMuted(true);
+            p.play();
+          });
+        }
+      });
+
+      // Закрытие
+      const closeModal = () => {
+        console.log("🎬 Функция closeModal вызвана");
+        modal.classList.remove("is-open");
+        document.body.style.overflow = "";
+        if (player) {
+          player.pause();
+          console.log("⏸ Видео поставлено на паузу");
+        }
+      };
+
+      // 1. Закрытие при клике на overlay
+      modal.addEventListener("click", (e) => {
+        console.log("🖱 Клик по модальному окну. Target:", e.target);
+        console.log("🆔 Сравнение e.target === modal:", e.target === modal);
+
+        if (e.target === modal) {
+          console.log("✅ Клик попал точно в фон, закрываем...");
+          closeModal();
+        } else {
+          console.log("❌ Клик попал в дочерний элемент, игнорируем закрытие.");
+        }
+      });
+
+      // 2. Остановка всплытия (чтобы клики на плеере не закрывали его)
+      if (vimeoWrapper) {
+        vimeoWrapper.addEventListener("click", (e) => {
+          console.log("📺 Клик внутри контейнера видео (всплытие остановлено)");
+          e.stopPropagation();
+        });
+      }
+
+      // 3. Кнопка закрытия
+      if (closeBtn) {
+        closeBtn.addEventListener("click", (e) => {
+          console.log("✖️ Клик по кнопке закрытия (крестик)");
+          e.stopPropagation();
+          closeModal();
+        });
+      }
+
+      // Параллакс
+      if (!img.classList.contains("initialised")) {
+        initParallax(img, 20);
+        img.classList.add("initialised");
+      }
+
+      container.classList.add("js-initialized");
+    });
+  }
+
+  // Очистка и запуск
+  const runInit = () => {
+    initProjectCard();
+    ScrollTrigger.refresh();
+  };
+
+  document.addEventListener("astro:page-load", runInit);
+  runInit();
+
+  setupParallax();
+
+  document.addEventListener("astro:page-load", setupParallax);
+
+  window.addEventListener("load", () => ScrollTrigger.refresh());
+</script>

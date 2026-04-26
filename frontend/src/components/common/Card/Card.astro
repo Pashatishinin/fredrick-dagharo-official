@@ -10,7 +10,7 @@ interface Props {
 	data?: {
 		title: string;
 		isBig: boolean;
-		gif: string;
+		gif?: string;
 		link: string;
 	};
 }
@@ -40,16 +40,20 @@ const {
   <div
     class=`relative w-full overflow-hidden ${data?.isBig ? 'flex-grow min-h-[400px]' : 'aspect-video min-h-[200px]'}`
   >
-    <img
-      src={data?.gif}
-      alt="Loading Animation"
-      class="absolute inset-0 block w-full h-full object-cover"
-    />
+    {
+      data?.gif && (
+        <img
+          src={data.gif}
+          alt="Loading Animation"
+          class="absolute inset-0 block w-full h-full object-cover"
+        />
+      )
+    }
 
     <img
       src="/image.jpg"
       alt="Project Cover"
-      class="parallax-element absolute -top-[10%] left-0 w-full h-[120%] object-cover transition-opacity duration-300 group-hover:opacity-0"
+      class=`parallax-element absolute -top-[10%] left-0 w-full h-[120%] object-cover transition-opacity duration-300 ${data?.gif ? 'group-hover:opacity-0' : ''}`
     />
   </div>
 </div>
@@ -58,20 +62,22 @@ const {
   import { initParallax } from "../../../shared/animation/parallax";
 
   function setupParallax() {
-    requestAnimationFrame(() => {
-      const elements = document.querySelectorAll(
-        ".parallax-element:not(.initialised)",
-      );
+    const elements = document.querySelectorAll(".parallax-element");
 
-      if (elements.length === 0) return;
+    if (elements.length === 0) return;
 
-      elements.forEach((el) => {
-        initParallax(el as HTMLElement, 10);
-        el.classList.add("initialised");
-      });
+    elements.forEach((el) => {
+      el.classList.remove("initialised");
+
+      initParallax(el as HTMLElement, 10);
+      el.classList.add("initialised");
     });
+
+    ScrollTrigger.refresh();
   }
-  document.addEventListener("astro:page-load", setupParallax);
+  document.addEventListener("astro:page-load", () => {
+    setTimeout(setupParallax, 650);
+  });
 
   if (document.readyState === "complete") {
     setupParallax();

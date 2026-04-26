@@ -3,102 +3,96 @@ import DecodeText from "../../../components/animations/DecodeText.astro";
 import Card from "../../../components/common/Card/Card.astro";
 import { fetchHomeData } from "../../../shared/fetch";
 
-const bigItems = [6, 11];
-
-const categories = [
-	{ url: "/", title: "GRATING" },
-	{ url: "/", title: "COMMERCIAL FILMS" },
-	{ url: "/", title: "Experimental Films" },
-];
+const categories = [{ url: "/photography", title: "35MM PHOTOGRAPHY" }];
 
 const data = [
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_1.GIF",
+		// gif: "/projects/project_1.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_2.GIF",
+		// gif: "/projects/project_2.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_3.GIF",
+		// gif: "/projects/project_3.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_4.GIF",
+		// gif: "/projects/project_4.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_1.GIF",
+		// gif: "/projects/project_1.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_2.GIF",
-		isBig: true,
-		link: "/projects",
-	},
-	{
-		title: "PUMA x FREDRICK",
-		gif: "/projects/project_3.GIF",
+		// gif: "/projects/project_2.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_4.GIF",
+		// gif: "/projects/project_3.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_1.GIF",
+		// gif: "/projects/project_4.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_2.GIF",
+		// gif: "/projects/project_1.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_3.GIF",
-		isBig: true,
-		link: "/projects",
-	},
-	{
-		title: "PUMA x FREDRICK",
-		gif: "/projects/project_4.GIF",
+		// gif: "/projects/project_2.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_1.GIF",
+		// gif: "/projects/project_3.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_2.GIF",
+		// gif: "/projects/project_4.GIF",
 		isBig: false,
 		link: "/projects",
 	},
 	{
 		title: "PUMA x FREDRICK",
-		gif: "/projects/project_3.GIF",
+		// gif: "/projects/project_1.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		// gif: "/projects/project_2.GIF",
+		isBig: false,
+		link: "/projects",
+	},
+	{
+		title: "PUMA x FREDRICK",
+		// gif: "/projects/project_3.GIF",
 		isBig: false,
 		link: "/projects",
 	},
@@ -130,7 +124,7 @@ const data = [
   </div>
 
   <div
-    class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 py-4 grid-flow-dense"
+    class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-2 py-4 grid-flow-dense"
   >
     {
       data.map((item, index) => {

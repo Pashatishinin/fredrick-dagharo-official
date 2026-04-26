@@ -4,10 +4,7 @@
 </div>
 
 <script>
-  import { createPerfTracker } from "../../shared/test/perf";
-
-  const locationPerf = createPerfTracker("📍 Location Update");
-  const renderPerf = createPerfTracker("⏱ Full Render");
+  let timerId: number | undefined;
 
   function updateTime() {
     const timeElement = document.getElementById("current-time");
@@ -22,22 +19,33 @@
   }
 
   function getLocation() {
-    locationPerf.start();
     const locElement = document.getElementById("current-location");
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const offset = -new Date().getTimezoneOffset() / 60;
-    const gmtDisplay = `GMT${offset >= 0 ? "+" : ""}${offset}`;
+    if (!locElement) return;
 
-    if (locElement) {
+    try {
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const offset = -new Date().getTimezoneOffset() / 60;
+      const gmtDisplay = `GMT${offset >= 0 ? "+" : ""}${offset}`;
       locElement.innerText = `${timeZone} (${gmtDisplay})`;
+    } catch (e) {
+      locElement.innerText = "Location unavailable";
     }
-
-    locationPerf.end();
   }
 
-  renderPerf.start();
-  setInterval(updateTime, 1000);
-  updateTime();
-  getLocation();
-  renderPerf.end();
+  function initClock() {
+    if (timerId) {
+      clearInterval(timerId);
+    }
+
+    updateTime();
+    getLocation();
+
+    timerId = window.setInterval(updateTime, 1000);
+  }
+
+  document.addEventListener("astro:page-load", initClock);
+
+  document.addEventListener("astro:before-preparation", () => {
+    if (timerId) clearInterval(timerId);
+  });
 </script>

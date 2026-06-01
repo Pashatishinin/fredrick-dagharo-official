@@ -11,8 +11,6 @@ const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET, PUBLIC_SANITY_API_VERSI
 	"",
 );
 
-
-
 // https://astro.build/config
 export default defineConfig({
 	vite: {

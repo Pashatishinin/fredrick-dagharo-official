@@ -1,0 +1,15 @@
+---
+import DecodeText from "../../components/animations/DecodeText.astro";
+import FooterContent from "./ui/FooterContent.astro";
+---
+
+<footer
+  class="relative h-[800px] z-30"
+  style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
+>
+  <div class="relative h-[calc(100vh+800px)] -top-[100vh]">
+    <div class="sticky top-[calc(100vh-800px)] h-[800px]">
+      <FooterContent />
+    </div>
+  </div>
+</footer>

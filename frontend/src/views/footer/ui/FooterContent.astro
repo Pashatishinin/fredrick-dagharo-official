@@ -1,0 +1,119 @@
+---
+import DecodeText from "../../../components/animations/DecodeText.astro";
+import FooterVideo from "./FooterVideo.astro";
+
+const contact = [
+	{ url: "/index", label: "ARCHIVE" },
+	{ url: "/", label: "SELECTED FILMS" },
+];
+const pathname = new URL(Astro.request.url).pathname;
+const isHome = pathname === "/" || pathname === "/index.html";
+---
+
+<section
+  class="h-full py-30 w-full px-[clamp(20px,5vw,100px)] overflow-hidden relative flex flex-col justify-end"
+>
+  <div class="hidden sm:block">
+    <FooterVideo />
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 relative z-10 text-[#f9f9f9]">
+    <div
+      class="col-span-2 md:col-span-1 text-6xl font-black tracking-tighter mb-8 md:mb-0"
+    >
+      <a href="/" id="logo-link-footer" class:list={[{ "is-home": isHome }]}>
+        <h1>FREDRICK</h1>
+        <h1>DAGNARO</h1>
+      </a>
+    </div>
+    <div class="py-4">
+      <h1 class="text-[14px] mb-2 opacity-80">SOCIAL</h1>
+      <ul class="flex gap-1 flex-col">
+        <li class="text-sm">
+          <a
+            href="https://www.instagram.com/fredrick_dagharo/"
+            class="w-fit block"
+            ><DecodeText duration={1} class="my-custom-style"
+              >INSTAGRAM</DecodeText
+            ></a
+          >
+        </li>
+
+        <li class="text-sm">
+          <a href="https://vimeo.com/fredrick" class="w-fit block"
+            ><DecodeText duration={1} class="my-custom-style">VIMEO</DecodeText
+            ></a
+          >
+        </li>
+        <li class="text-sm">
+          <a
+            href="https://de.linkedin.com/in/fredrick-dagharo/de"
+            class="w-fit block"
+            ><DecodeText duration={1} class="my-custom-style"
+              >LINKEDIN</DecodeText
+            ></a
+          >
+        </li>
+      </ul>
+    </div>
+    <div class="py-4">
+      <h1 class="text-sm mb-2 opacity-80">SITEMAP</h1>
+      <ul class="flex gap-1 flex-col">
+        {
+          contact.map((link) => {
+            const isActive =
+              pathname === link.url || pathname === link.url + "/";
+
+            return (
+              <li>
+                <a
+                  href={isActive ? "javascript:void(0)" : link.url}
+                  class:list={[
+                    "w-fit block",
+                    {
+                      "pointer-events-auto": !isActive,
+                      "pointer-events-none opacity-40": isActive,
+                    },
+                  ]}
+                >
+                  <DecodeText
+                    duration={1}
+                    class="my-custom-style text-[12px] sm:text-[14px]"
+                  >
+                    {link.label}
+                  </DecodeText>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
+
+  gsap.registerPlugin(ScrollToPlugin);
+
+  function setupFooterLogo() {
+    const logo = document.getElementById("logo-link-footer");
+    if (!logo) return;
+
+    const isHome =
+      window.location.pathname === "/" ||
+      window.location.pathname === "/index.html";
+
+    logo.onclick = (e) => {
+      if (isHome) {
+        e.preventDefault();
+        gsap.to(window, { duration: 1.2, scrollTo: 0, ease: "power4.inOut" });
+      }
+    };
+  }
+
+  document.addEventListener("astro:page-load", setupFooterLogo);
+  setupFooterLogo();
+</script>

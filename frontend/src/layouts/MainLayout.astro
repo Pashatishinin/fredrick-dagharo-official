@@ -2,9 +2,17 @@
 import Header from "../views/header/Header.astro";
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
-import CustomCursor from "../components/ui/CustomCursor.astro";
+import DecodeText from "../components/animations/DecodeText.astro";
+import CustomCursor from "../components/ui/custom-cursor/CustomCursor.astro";
 import Loader from "../components/ui/loader/Loader.astro";
-import Footer from "../views/footer/Footer.astro";
+import FooterSection from "../views/footer/FooterSection.astro";
+
+interface Props {
+	title?: string;
+}
+
+const { title } = Astro.props;
+const pageTitle = title ? `${title} — Fredrick Dagharo` : "Fredrick Dagharo";
 ---
 
 <!doctype html>
@@ -12,14 +20,13 @@ import Footer from "../views/footer/Footer.astro";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="https://use.typekit.net/bef2bdy.css" />
     <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="https://use.typekit.net/bef2bdy.css" />
     <meta name="generator" content={Astro.generator} />
 
     <script src="../shared/lib/gsap-init.ts"></script>
     <ClientRouter />
-    <title>Astro Basics</title>
+    <title>{pageTitle}</title>
 
     <script is:inline>
       function initLoaderState() {
@@ -33,7 +40,20 @@ import Footer from "../views/footer/Footer.astro";
       }
       initLoaderState();
 
+      document.addEventListener("astro:before-swap", () => {
+        // Сбрасываем скролл ДО того, как страницы поменяются местами
+        window.scrollTo(0, 0);
+      });
+
       document.addEventListener("astro:after-swap", () => {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        document.body.scrollTo({ top: 0, left: 0, behavior: "instant" });
+        document.documentElement.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "instant",
+        });
+
         document.documentElement.classList.add("loader-visited");
         window.HERO_DELAY = 0.2;
       });
@@ -42,16 +62,39 @@ import Footer from "../views/footer/Footer.astro";
   <body>
     <Loader />
     <CustomCursor />
+    <Header transition:name="hero" transition:persist />
     <main id="main-content">
-      <Header />
       <slot />
-      <Footer />
+      <FooterSection />
     </main>
+    <div
+      id="scroll-top-btn"
+      role="button"
+      tabindex="0"
+      aria-label="Scroll to top"
+      transition:persist
+      class="fixed bottom-16 left-4 sm:left-16 z-100000 opacity-0 pointer-events-none transition-opacity duration-300"
+    >
+      <span class="flex gap-2 text-[14px]">
+        [
+        <DecodeText>TOP</DecodeText> ]</span
+      >
+    </div>
   </body>
 </html>
 
 <style is:global>
+  @import url("https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
   /* Если лоадер уже был — скрываем его мгновенно через CSS */
+
+  h1,
+  h5 {
+    font-family: "Averia Serif Libre", serif;
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: -0.1em;
+    line-height: 80%;
+  }
   .loader-visited #loader {
     display: none !important;
   }
@@ -68,20 +111,37 @@ import Footer from "../views/footer/Footer.astro";
 
   /* Ваши стили переходов */
   ::view-transition-old(root) {
-    animation: none;
+    animation: slide-down 1s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 1;
   }
   ::view-transition-new(root) {
     z-index: 2;
-    animation: slide-up 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slide-up 1s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @keyframes slide-up {
-    from {
-      transform: translateY(100%);
+    0% {
+      transform: translateY(120%) rotate(-2deg) scaleY(0.4) scale(1.2);
     }
-    to {
+
+    10% {
+      transform: translateY(100%) rotate(-2deg) scaleY(0.4) scale(1.2);
+    }
+    100% {
       transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-down {
+    0% {
+      transform: translateY(0);
+    }
+
+    10% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-120%) rotate(2deg) scaleY(0.6);
     }
   }
 
@@ -90,11 +150,35 @@ import Footer from "../views/footer/Footer.astro";
     margin: 0;
     width: 100%;
     min-height: 100%;
-    background-color: #010101;
-    color: #ebebeb;
+    background-color: #090909;
+    color: #f9f9f9;
     max-width: 1920px;
     margin: auto;
     font-family: "Space Grotesk", sans-serif;
+  }
+
+  html {
+    overflow-anchor: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    /* Заставляем снимки страниц быть строго по размеру экрана */
+    height: 100vh !important;
+    width: 100vw !important;
+    object-fit: cover;
+    object-position: top; /* Всегда показываем верх снимка */
+  }
+
+  ::view-transition-group(root) {
+    animation-duration: 1s;
+    /* Фиксируем контейнер анимации в окне, чтобы скролл не влиял на координаты */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
 </style>
 
@@ -102,11 +186,18 @@ import Footer from "../views/footer/Footer.astro";
   import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
   import { gsap } from "gsap";
 
+  if (typeof window !== "undefined" && history.scrollRestoration) {
+    history.scrollRestoration = "manual";
+  }
+
+  // 3. Подготовка DOM перед показом новой страницы
+
+  // 4. Основной цикл загрузки
+
   function handleLoader() {
     const loader = document.getElementById("loader");
     const mainContent = document.getElementById("main-content");
 
-    // Если класса loader-visited нет — запускаем анимацию
     if (!document.documentElement.classList.contains("loader-visited")) {
       if (loader && mainContent) {
         const tl = gsap.timeline({
@@ -117,7 +208,6 @@ import Footer from "../views/footer/Footer.astro";
           },
         });
 
-        // Длительность соответствует задержке (HERO_DELAY)
         tl.to(loader, { opacity: 0, duration: 0.8, delay: 2.5 }).to(
           mainContent,
           { opacity: 1, duration: 0.5 },
@@ -128,6 +218,9 @@ import Footer from "../views/footer/Footer.astro";
   }
 
   document.addEventListener("astro:page-load", () => {
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+    });
     handleLoader();
 
     setTimeout(() => {
@@ -135,8 +228,37 @@ import Footer from "../views/footer/Footer.astro";
     }, 650);
   });
 
-  document.addEventListener("astro:before-preparation", () => {
+  document.addEventListener("astro:before-preparation", (ev: any) => {
+    ev.detail.formData = null;
     ScrollTrigger.getAll().forEach((t) => t.kill());
     gsap.killTweensOf("*");
   });
+
+  document.addEventListener("astro:after-swap", () => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+
+  function setupScrollTopBtn() {
+    const btn = document.getElementById("scroll-top-btn");
+    if (!btn || btn.dataset.initialized) return;
+    btn.dataset.initialized = "true";
+
+    const onScroll = () => {
+      const visible = window.scrollY > 300;
+      btn.style.opacity = visible ? "1" : "0";
+      btn.style.pointerEvents = visible ? "auto" : "none";
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    btn.addEventListener("click", () => {
+      gsap.to(window, { scrollTo: 0, duration: 1, ease: "power3.inOut" });
+    });
+  }
+
+  document.addEventListener("astro:page-load", setupScrollTopBtn);
+  setupScrollTopBtn();
 </script>

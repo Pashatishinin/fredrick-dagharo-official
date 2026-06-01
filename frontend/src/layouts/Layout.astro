@@ -3,9 +3,9 @@ import Header from "../views/header/Header.astro";
 
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
-import CustomCursor from "../components/ui/CustomCursor.astro";
+import CustomCursor from "../components/ui/custom-cursor/CustomCursor.astro";
 import Loader from "../components/ui/loader/Loader.astro";
-import Footer from "../views/footer/Footer.astro";
+import FooterSection from "../views/footer/FooterSection.astro";
 ---
 
 <!doctype html>
@@ -24,34 +24,17 @@ import Footer from "../views/footer/Footer.astro";
     <CustomCursor />
     <Header />
     <slot />
-    <Footer />
+    <FooterSection />
   </body>
 </html>
 
 <style>
-  ::view-transition-old(root) {
-    animation: none;
-    z-index: 1;
-  }
-  ::view-transition-new(root) {
-    z-index: 2;
-    animation: slide-up 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes slide-up {
-    from {
-      transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
   html,
   body {
     /* width: 100%; */
     min-height: 100%;
-    background-color: #010101;
-    color: #ebebeb;
+    background-color: #090909;
+    color: #f9f9f9;
     max-width: 1920px;
     padding: 0;
 
@@ -60,8 +43,19 @@ import Footer from "../views/footer/Footer.astro";
 </style>
 
 <style is:global>
+  @import url("https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
+
   body {
     /* font-family: "Space Mono", monospace; */
     font-family: "Space Grotesk", sans-serif;
+  }
+
+  h1,
+  h5 {
+    font-family: "Averia Serif Libre", serif;
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: -0.1em;
+    line-height: 80%;
   }
 </style>

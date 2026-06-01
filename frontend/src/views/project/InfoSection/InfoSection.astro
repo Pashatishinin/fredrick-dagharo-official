@@ -1,25 +1,53 @@
 ---
 import TextEffect from "../../../components/animations/TextEffect.astro";
+
+interface Props {
+	data?: {
+		title: string;
+		isBig: boolean;
+		gif?: string;
+		slug: string;
+		urlVimeo?: string;
+		info?: string;
+		city?: string;
+		year?: string;
+	};
+}
+
+const { data } = Astro.props;
 ---
 
-<section class="py-16 px-16 grid grid-cols-4 gap-16 w-full">
-  <div><p>01 PUMA x Fredrick</p></div>
-  <div class="col-span-2 flex flex-col gap-8">
-    <p class="text-center">MORE INFO</p>
+<section
+  class="py-16 px-4 sm:px-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16 w-full"
+>
+  <div class="flex flex-col gap-4 sm:gap-8">
+    <p class="text-center sm:text-left text-[12px]">PROJECT NAME</p>
+    <p class="text-center sm:text-left uppercase">
+      {data?.title}
+    </p>
+  </div>
+  <div
+    class="sm:col-span-2 flex flex-col gap-4 sm:gap-8 order-2 sm:order-3 lg:order-2"
+  >
+    <p class="text-center text-[12px]">MORE INFO</p>
     <TextEffect
-      ><p class="uppercase">
-        "The Painted Area" is a visceral exploration of legacy, sacrifice, and
-        the weight of expectation, following Elias Thorne, a rising star whose
-        devotion to the game is tested by a career-threatening injury and the
-        haunting pressure to fulfill a dream that may no longer be his own.
+      ><p class="uppercase text-center">
+        {data?.info}
       </p></TextEffect
     >
   </div>
-  <div class="flex flex-col gap-8">
-    <p class="text-right">2026</p><TextEffect
-      ><p class="text-right">
-        HERZOGENAURACH, BAYERN 10.8819° N, 49.5700° W 35mm KODAK FILM
-      </p></TextEffect
-    >
+  <div
+    class="sm:col-span-1 flex flex-col gap-4 sm:gap-8 order-3 sm:order-2 lg:order-3"
+  >
+    <p class="text-center sm:text-right text-[12px]">{data?.year}</p>
+    <div>
+      <TextEffect
+        ><p class="text-center sm:text-right">
+          {data?.city}
+        </p></TextEffect
+      ><TextEffect
+        ><p class="text-center sm:text-right">35mm KODAK FILM</p>
+      </TextEffect>
+    </div>
   </div>
 </section>

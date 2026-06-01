@@ -1,0 +1,35 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { filmData } from "../../shared/data/films.data";
+import GallerySection from "../../views/project/GallerySection/GallerySection.astro";
+import HeroSection from "../../views/project/HeroSection/HeroSection.astro";
+import InfoSection from "../../views/project/InfoSection/InfoSection.astro";
+import NextSection from "../../views/project/NextSection/NextSection.astro";
+
+export async function getStaticPaths() {
+	const data = filmData;
+
+	return data.map((project, index) => {
+		const prevIndex = (index - 1 + data.length) % data.length;
+		const nextIndex = (index + 1) % data.length;
+		return {
+			params: { slug: project.slug },
+			props: {
+				project,
+				previousProject: data[prevIndex],
+				nextProject: data[nextIndex],
+			},
+		};
+	});
+}
+
+const { project, previousProject, nextProject } = Astro.props;
+---
+
+<MainLayout title={project.title}>
+  <HeroSection data={project} />
+  <InfoSection data={project} />
+  <!-- <GallerySection /> -->
+  <NextSection previous={previousProject} next={nextProject} />
+</MainLayout>

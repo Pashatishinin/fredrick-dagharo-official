@@ -1,43 +1,26 @@
+---
+import GalleryContent from "./ui/GalleryContent.astro";
+
+const data1 = [
+	{ src: "/image.jpg", alt: "Image 1" },
+	{ src: "/image.jpg", alt: "Image 2" },
+	{ src: "/image.jpg", alt: "Image 3" },
+];
+const data2 = [
+	{ src: "/image.jpg", alt: "Image 1" },
+	{ src: "/image.jpg", alt: "Image 2" },
+	{ src: "/image.jpg", alt: "Image 3" },
+	{ src: "/image.jpg", alt: "Image 4" },
+];
+---
+
 <section>
-  <div class="flex flex-row w-full">
-    <div class="group relative min-h-screen overflow-hidden">
-      <img
-        src="/image.jpg"
-        alt="Project Cover"
-        class="parallax-element w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
-      />
-    </div>
-
-    <div class="group relative min-h-screen overflow-hidden">
-      <img
-        src="/image.jpg"
-        alt="Project Cover"
-        class="parallax-element w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
-      />
-    </div>
-  </div>
-  <div class="group relative min-h-screen overflow-hidden">
-    <img
-      src="/image.jpg"
-      alt="Project Cover"
-      class="parallax-element w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
-    />
-  </div>
-  <div class="flex flex-row w-full">
-    <div class="group relative min-h-screen overflow-hidden">
-      <img
-        src="/image.jpg"
-        alt="Project Cover"
-        class="parallax-element w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
-      />
-    </div>
-
-    <div class="group relative min-h-screen overflow-hidden">
-      <img
-        src="/image.jpg"
-        alt="Project Cover"
-        class="parallax-element w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
-      />
-    </div>
-  </div>
+  <GalleryContent
+    images={data1}
+    text="Lights Out is a campaign film where training becomes something greater, and the right boot makes all the difference. PUMA's Future and Ultra go head to head on one pitch — skill versus speed, control versus power — until you realise you don't have to choose."
+  />
+  <GalleryContent
+    images={data2}
+    text="Lights Out is a campaign film where training becomes something greater, and the right boot makes all the difference. PUMA's Future and Ultra go head to head on one pitch — skill versus speed, control versus power — until you realise you don't have to choose."
+  />
 </section>

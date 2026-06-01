@@ -1,9 +1,11 @@
 ---
 import { Vimeo } from "@astro-community/astro-embed-vimeo";
+import { getVimeoThumbnail } from "../../../shared/utils/vimeo.utils";
 
 interface Props {
 	number?: string | number;
 	isBig?: boolean;
+	fill?: boolean;
 	title?: string;
 	subTitle?: string;
 	right?: boolean;
@@ -11,7 +13,8 @@ interface Props {
 		title: string;
 		isBig: boolean;
 		gif?: string;
-		link: string;
+		slug?: string;
+		urlVimeo?: string;
 	};
 }
 
@@ -19,26 +22,33 @@ const {
 	data,
 	number,
 	isBig = false,
+	fill = false,
 	title = "PUMA x FREDRICK",
-	subTitle = "Project",
+	subTitle = "",
 	right = false,
 } = Astro.props;
+
+const cdnLink = await getVimeoThumbnail(data?.urlVimeo, "/image.jpg");
 ---
 
 <div
-  class=`group relative w-full flex flex-col overflow-clip gap-4 ${data?.isBig ? 'h-full sm:col-span-2 sm:row-span-2' : ''}`
+  class=`group relative w-full flex flex-col overflow-clip gap-4 h-full ${data?.isBig ? 'sm:col-span-2 sm:row-span-2' : ''}`
 >
   <div class=`flex gap-8 mt-4 w-full ${right ? 'justify-end' : ''}`>
-    {number && <p class="text-[12px]">[{number}]</p>}
+    {number && <p class="text-[10px]">[{number}]</p>}
 
     <div class=`${right ? 'text-right' : ''}`>
-      <p class="text-[12px] opacity-60">{subTitle}</p>
-      <p class="text-[12px] uppercase">{data?.title}</p>
+      <p class="text-[10px] opacity-60">{subTitle}</p>
+      <p
+        class=`text-[10px] uppercase truncate ${data?.isBig ? 'max-w-100' : 'max-w-50'}`
+      >
+        {data?.title}
+      </p>
     </div>
   </div>
 
   <div
-    class=`relative w-full overflow-hidden ${data?.isBig ? 'flex-grow min-h-[400px]' : 'aspect-video min-h-[200px]'}`
+    class=`relative w-full overflow-hidden ${fill ? 'grow min-h-0' : data?.isBig ? 'min-h-115.5' : 'aspect-video min-h-50'}`
   >
     {
       data?.gif && (
@@ -51,9 +61,9 @@ const {
     }
 
     <img
-      src="/image.jpg"
+      src={cdnLink}
       alt="Project Cover"
-      class=`parallax-element absolute -top-[10%] left-0 w-full h-[120%] object-cover transition-opacity duration-300 ${data?.gif ? 'group-hover:opacity-0' : ''}`
+      class=`parallax-element absolute bottom-[-10%] left-0 w-full h-[120%] object-cover transition-opacity duration-300 ${data?.gif ? 'group-hover:opacity-0' : ''}`
     />
   </div>
 </div>

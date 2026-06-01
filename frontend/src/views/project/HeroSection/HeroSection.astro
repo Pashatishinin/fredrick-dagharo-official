@@ -1,37 +1,67 @@
 ---
 import { Vimeo } from "@astro-community/astro-embed-vimeo";
+import MainTitle from "../../../components/ui/titles/main-title/MainTitle.astro";
+import { getVimeoThumbnail } from "../../../shared/utils/vimeo.utils";
+
+interface Props {
+	data?: {
+		title: string;
+		isBig: boolean;
+		gif?: string;
+		slug: string;
+		urlVimeo?: string;
+	};
+}
+
+const { data } = Astro.props;
+
+const cdnLink = await getVimeoThumbnail(data?.urlVimeo, "/image.jpg");
 ---
 
 <div
   class="video-project-card group relative w-full min-h-screen overflow-hidden"
 >
   <div
-    class="video-modal fixed inset-0 z-[100] flex items-center justify-center bg-black/90 opacity-0 pointer-events-none transition-opacity duration-300"
+    class="video-modal fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300"
   >
-    <!-- <button
-      class="close-modal absolute top-5 right-5 text-white text-4xl z-[110] cursor-pointer"
-      >&times;</button
-    > -->
+    <div class="modal-overlay absolute inset-0 bg-black/90"></div>
 
     <div
-      class="video-container relative w-[90vw] aspect-video max-w-6xl shadow-2xl"
+      class="video-container relative z-10 w-[90vw] aspect-video max-w-6xl shadow-2xl"
     >
+      <button
+        class="close-modal absolute -top-10 right-0 text-[#f9f9f9] text-sm uppercase tracking-widest hover:opacity-60 transition-opacity"
+      >
+        Close [x]
+      </button>
+
       <div class="cursor-tracker absolute inset-0 z-[50]"></div>
 
-      <Vimeo
-        id="https://vimeo.com/392460230"
+      <!-- <Vimeo
+        id=`https://vimeo.com/${data?.urlVimeo}`
+        `
         params="controls=1&muted=0&autoplay=0"
-      />
+      /> -->
+      <div class="video-wrapper">
+        <iframe
+          src={`https://player.vimeo.com/video/${data?.urlVimeo}?controls=1&muted=0&autoplay=0`}
+          width="640"
+          height="360"
+          frameborder="0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          data-vimeo-id={data?.urlVimeo}></iframe>
+      </div>
     </div>
   </div>
   <div
     class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
   >
-    <h1 class="text-7xl font-black -tracking-widest">PUMA x FREDRICK</h1>
+    <MainTitle title={data?.title} />
   </div>
 
   <img
-    src="/image.jpg"
+    src={cdnLink}
     alt="Project Cover"
     class="view parallax-element absolute top-0 left-0 w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
   />
@@ -43,13 +73,8 @@ import { Vimeo } from "@astro-community/astro-embed-vimeo";
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
-    height: 90vh !important;
-    width: calc(90vh * 1.77777778) !important;
-
-    max-width: 90vw;
-    max-height: calc(90vw * 0.5625);
-
+    height: 100%;
+    width: auto;
     overflow: hidden;
     z-index: 0;
   }
@@ -70,6 +95,10 @@ import { Vimeo } from "@astro-community/astro-embed-vimeo";
     border: none;
 
     object-fit: cover;
+  }
+
+  .video-modal:not(.is-open) iframe {
+    pointer-events: none !important;
   }
 
   .video-container [data-vimeo-embed],
@@ -175,7 +204,7 @@ import { Vimeo } from "@astro-community/astro-embed-vimeo";
       const img = container.querySelector(".view") as HTMLElement;
       const modal = container.querySelector(".video-modal") as HTMLElement;
       const vimeoWrapper = container.querySelector(".video-container"); // Родитель для видео
-      const closeBtn = container.querySelector(".close-modal") as HTMLElement;
+      const closeBtn = modal.querySelector(".close-modal");
 
       if (!img || !modal || !vimeoWrapper) return;
 
@@ -214,8 +243,18 @@ import { Vimeo } from "@astro-community/astro-embed-vimeo";
 
         const p = getPlayer();
         if (p) {
+          const wrapper = container.querySelector(
+            ".video-wrapper",
+          ) as HTMLElement;
+          if (wrapper) {
+            Promise.all([p.getVideoWidth(), p.getVideoHeight()])
+              .then(([w, h]) => {
+                wrapper.style.aspectRatio = `${w} / ${h}`;
+              })
+              .catch(() => {});
+          }
+
           p.play().catch(() => {
-            // Если автоплей заблокирован, пробуем включить звук и играть
             p.setMuted(true);
             p.play();
           });
@@ -224,41 +263,44 @@ import { Vimeo } from "@astro-community/astro-embed-vimeo";
 
       // Закрытие
       const closeModal = () => {
-        console.log("🎬 Функция closeModal вызвана");
         modal.classList.remove("is-open");
         document.body.style.overflow = "";
-        if (player) {
-          player.pause();
-          console.log("⏸ Видео поставлено на паузу");
-        }
+        if (player) player.pause();
       };
 
-      // 1. Закрытие при клике на overlay
       modal.addEventListener("click", (e) => {
-        console.log("🖱 Клик по модальному окну. Target:", e.target);
-        console.log("🆔 Сравнение e.target === modal:", e.target === modal);
-
-        if (e.target === modal) {
-          console.log("✅ Клик попал точно в фон, закрываем...");
+        if (
+          !(e.target as Element).closest("iframe") &&
+          !(e.target as Element).closest(".close-modal")
+        ) {
           closeModal();
-        } else {
-          console.log("❌ Клик попал в дочерний элемент, игнорируем закрытие.");
         }
       });
 
       // 2. Остановка всплытия (чтобы клики на плеере не закрывали его)
       if (vimeoWrapper) {
         vimeoWrapper.addEventListener("click", (e) => {
-          console.log("📺 Клик внутри контейнера видео (всплытие остановлено)");
-          e.stopPropagation();
+          const target = e.target as Element;
+          if (target.closest(".video-wrapper") || target.tagName === "IFRAME") {
+            e.stopPropagation();
+          } else {
+            closeModal();
+          }
         });
       }
 
       // 3. Кнопка закрытия
+      // if (closeBtn) {
+      //   closeBtn.addEventListener("click", (e) => {
+      //     console.log("✖️ Клик по кнопке закрытия (крестик)");
+      //     e.stopPropagation();
+      //     closeModal();
+      //   });
+      // }
+
       if (closeBtn) {
         closeBtn.addEventListener("click", (e) => {
-          console.log("✖️ Клик по кнопке закрытия (крестик)");
-          e.stopPropagation();
+          e.stopPropagation(); // Важно, чтобы клик не ушел в контейнер
           closeModal();
         });
       }

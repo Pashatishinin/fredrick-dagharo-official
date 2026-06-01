@@ -1,0 +1,158 @@
+<div id="custom-cursor-outline" class="cursor-outline">
+  <span class="cursor-text cursor-play">[ PLAY ]</span>
+  <span class="cursor-text cursor-close">[ CLOSE ]</span>
+</div>
+
+<script>
+  import { gsap } from "gsap";
+
+  const initCursor = () => {
+    const outline = document.getElementById("custom-cursor-outline");
+    const playText = document.querySelector(".cursor-play") as HTMLElement;
+    const closeText = document.querySelector(".cursor-close") as HTMLElement;
+
+    if (window.innerWidth < 700 || !outline) return;
+
+    const hideCursor = () => {
+      gsap.to(outline, { opacity: 0, duration: 0.2, overwrite: true });
+    };
+
+    const resetCursor = () => {
+      gsap.to(outline, { opacity: 1, duration: 0.3, overwrite: true });
+      if (playText)
+        gsap.to(playText, { opacity: 0, duration: 0.3, overwrite: true });
+      if (closeText)
+        gsap.to(closeText, { opacity: 0, duration: 0.3, overwrite: true });
+    };
+
+    const showPlay = () => {
+      gsap.to(outline, { opacity: 1, duration: 0.3 });
+      if (playText)
+        gsap.to(playText, {
+          opacity: 1,
+          color: "#f9f9f9",
+          duration: 0.3,
+          overwrite: true,
+        });
+      if (closeText)
+        gsap.to(closeText, { opacity: 0, duration: 0.1, overwrite: true });
+    };
+
+    const showClose = () => {
+      gsap.to(outline, { opacity: 1, duration: 0.3 });
+      if (closeText)
+        gsap.to(closeText, {
+          opacity: 1,
+          color: "#f9f9f9",
+          duration: 0.3,
+          overwrite: true,
+        });
+      if (playText)
+        gsap.to(playText, { opacity: 0, duration: 0.1, overwrite: true });
+    };
+
+    window.addEventListener("mousemove", (e) => {
+      const { clientX, clientY } = e;
+      const target = e.target as HTMLElement;
+
+      gsap.to(outline, {
+        x: clientX,
+        y: clientY,
+        duration: 0.4,
+        ease: "power2.out",
+      });
+
+      const modal = document.querySelector(".video-modal.is-open");
+
+      if (modal) {
+        const isOverVideo = !!target.closest(".video-wrapper");
+        const isOverCloseBtn = !!target.closest(".close-modal");
+        const isOverHeader =
+          !!target.closest("header") || !!target.closest(".header");
+
+        if (isOverCloseBtn || isOverHeader) {
+          resetCursor();
+        } else if (isOverVideo) {
+          hideCursor();
+        } else {
+          showClose();
+        }
+      }
+    });
+
+    document.addEventListener("mouseover", (e) => {
+      const target = e.target as HTMLElement;
+
+      if (target.closest(".video-wrapper") && !target.closest(".close-modal")) {
+        hideCursor();
+        return;
+      }
+
+      if (
+        target.closest("a") ||
+        target.closest("header") ||
+        target.closest(".header")
+      ) {
+        hideCursor();
+        return;
+      }
+
+      const isModalOpen = !!document.querySelector(".video-modal.is-open");
+
+      if (target.closest(".view") && !isModalOpen) {
+        showPlay();
+      }
+    });
+
+    document.addEventListener("mouseout", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest(".view") || target.closest("a")) {
+        resetCursor();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.classList.contains("video-modal") ||
+        target.classList.contains("close-modal")
+      ) {
+        resetCursor();
+      }
+    });
+  };
+
+  initCursor();
+  document.addEventListener("astro:page-load", initCursor);
+</script>
+
+<style>
+  .cursor-outline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    z-index: 1000000;
+  }
+
+  .cursor-text {
+    position: absolute;
+    font-size: 11px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    opacity: 0;
+    color: #f9f9f9;
+    font-family: monospace;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 700px) {
+    .cursor-outline {
+      display: none;
+    }
+  }
+</style>

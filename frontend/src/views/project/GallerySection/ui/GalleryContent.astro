@@ -1,0 +1,73 @@
+---
+import TextEffect from "../../../../components/animations/TextEffect.astro";
+
+interface Props {
+	images: { src: string; alt?: string }[];
+	text?: string;
+}
+
+const { images, text } = Astro.props;
+const isOdd = images.length % 2 !== 0;
+---
+
+<div class="flex flex-col gap-4">
+  <div class="grid grid-cols-2">
+    {
+      images.map((img, index) => {
+        const isFirstOfOdd = isOdd && index === 0;
+        return (
+          <div class={isFirstOfOdd ? "col-span-2" : "col-span-1"}>
+            <div class="group relative overflow-hidden">
+              <img
+                src={img.src}
+                alt={img.alt ?? "Gallery image"}
+                class="parallax-element w-full h-full object-cover z-10 cursor-pointer transition-opacity duration-300"
+              />
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+
+  {
+    text && (
+      <div class="max-w-200 text-center mx-auto">
+        <TextEffect>
+          <p class="uppercase text-center">{text}</p>
+        </TextEffect>
+      </div>
+    )
+  }
+</div>
+
+<script>
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+  import { initParallax } from "../../../../shared/animation/parallax";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  function setupParallax() {
+    const elements = document.querySelectorAll(
+      ".parallax-element:not(.initialised)",
+    );
+    elements.forEach((el) => {
+      if (el instanceof HTMLElement) {
+        initParallax(el, 15);
+        el.classList.add("initialised");
+      }
+    });
+    ScrollTrigger.refresh();
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    setTimeout(setupParallax, 650);
+  });
+
+  if (document.readyState === "complete") {
+    setupParallax();
+  } else {
+    window.addEventListener("load", setupParallax);
+  }
+</script>

@@ -160,12 +160,12 @@ export const filmData = [
 	{
 		title: "SS24 Euros TS Football Jack Grealish 50s",
 		year: "2026",
-		info: "",
+		info: "The Euros, through a different lens. A short film collection following PUMA Football's roster into the tournament — and asking what it really means to see the game the way Jack Grealish does.",
 		gif: "/projects/grealish.gif",
 		urlVimeo: "1157873449",
 		isBig: false,
 		slug: "project-19",
 		contentBlocks: [],
-		city: "",
+		city: "MANCHESTER",
 	},
 ];

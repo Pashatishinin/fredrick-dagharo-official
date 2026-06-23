@@ -15,17 +15,9 @@ export const films = defineType({
 			name: "title",
 			title: "Title",
 			type: "string",
+			options: { aiAssist: { exclude: true } },
 		}),
 
-		defineField({
-			name: "cover",
-			type: "image",
-			options: {
-				hotspot: true,
-			},
-			title: "Cover",
-			group: "media",
-		}),
 		defineField({
 			name: "slug",
 			title: "Slug",
@@ -33,6 +25,7 @@ export const films = defineType({
 			options: {
 				source: "title",
 				maxLength: 96,
+				aiAssist: { exclude: true },
 			},
 			validation: (Rule) => Rule.required(),
 		}),
@@ -40,11 +33,19 @@ export const films = defineType({
 			name: "year",
 			title: "Year",
 			type: "string",
+			options: { aiAssist: { exclude: true } },
 		}),
 		defineField({
 			name: "info",
 			title: "Info",
 			type: "text",
+			options: { aiAssist: { exclude: true } },
+		}),
+		defineField({
+			name: "city",
+			title: "City",
+			type: "string",
+			options: { aiAssist: { exclude: true } },
 		}),
 
 		defineField({
@@ -52,7 +53,19 @@ export const films = defineType({
 			type: "image",
 			options: {
 				hotspot: true,
+				aiAssist: {
+					imageDescriptionField: "alt",
+				},
 			},
+			fields: [
+				defineField({
+					name: "alt",
+					type: "string",
+					title: "Alt Text (SEO)",
+					description: "Use the AI icon to auto-generate",
+					validation: (rule) => rule.required().error("Alt text is required for SEO"),
+				}),
+			],
 			title: "Short Video",
 			group: "media",
 		}),
@@ -62,6 +75,15 @@ export const films = defineType({
 			title: "Number of video on Vimeo",
 			type: "string",
 			group: "media",
+			options: { aiAssist: { exclude: true } },
+		}),
+		defineField({
+			name: "isSelected",
+			title: "Selected Film",
+			type: "boolean",
+			description: "Turn on for project that should in main selected gallery",
+			initialValue: false,
+			options: { aiAssist: { exclude: true } },
 		}),
 
 		defineField({
@@ -70,6 +92,7 @@ export const films = defineType({
 			type: "boolean",
 			description: "Turn on for project that should take more space in main gallery",
 			initialValue: false,
+			options: { aiAssist: { exclude: true } },
 		}),
 		defineField({
 			name: "contentBlocks",
@@ -95,8 +118,21 @@ export const films = defineType({
 							of: [
 								{
 									type: "image",
-									options: { hotspot: true },
-									fields: [{ name: "alt", type: "string", title: "Alt text" }],
+									options: {
+										hotspot: true,
+										aiAssist: {
+											imageDescriptionField: "alt",
+										},
+									},
+									fields: [
+										defineField({
+											name: "alt",
+											type: "string",
+											title: "Alt Text (SEO)",
+											description: "Use the AI icon to auto-generate",
+											validation: (rule) => rule.required().error("Alt text is required for SEO"),
+										}),
+									],
 								},
 							],
 							options: {

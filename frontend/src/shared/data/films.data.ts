@@ -155,7 +155,7 @@ export const filmData = [
 		isBig: false,
 		slug: "project-19",
 		contentBlocks: [],
-		city: "",
+		city: "BRAZIL, LONDON",
 	},
 	{
 		title: "SS24 Euros TS Football Jack Grealish 50s",

@@ -1,97 +1,77 @@
 ---
-import { Vimeo } from "@astro-community/astro-embed-vimeo";
-import { getVimeoThumbnail } from "../../../shared/utils/vimeo.utils";
+import type { Film } from "../../../entities";
 
+/**
+ * Карточка фильма: обложка с Vimeo с параллаксом, поверх — гифка,
+ * которая проявляется при наведении. Одна на галерею главной и блок
+ * «предыдущий / следующий» на странице проекта.
+ */
 interface Props {
-	number?: string | number;
-	isBig?: boolean;
-	fill?: boolean;
-	title?: string;
+	film: Film;
+	/** Порядковый номер в галерее, уже отформатированный: «01». */
+	number?: string;
+	/** Подпись над названием: «Next Project». */
 	subTitle?: string;
+	/** Растянуть медиа на всю высоту родителя. */
+	fill?: boolean;
+	/** Подпись выровнена по правому краю. */
 	right?: boolean;
-	data?: {
-		title: string;
-		isBig: boolean;
-		gif?: string;
-		slug?: string;
-		urlVimeo?: string;
-	};
 }
 
-const {
-	data,
-	number,
-	isBig = false,
-	fill = false,
-	title = "PUMA x FREDRICK",
-	subTitle = "",
-	right = false,
-} = Astro.props;
-
-const cdnLink = await getVimeoThumbnail(data?.urlVimeo, "/image.jpg");
+const { film, number, subTitle, fill = false, right = false } = Astro.props;
 ---
 
-<div
-  class=`group relative w-full flex flex-col overflow-clip gap-4 h-full ${data?.isBig ? 'sm:col-span-2 sm:row-span-2' : ''}`
->
-  <div class=`flex gap-8 mt-4 w-full ${right ? 'justify-end' : ''}`>
-    {number && <p class="text-[10px]">[{number}]</p>}
+<div class:list={["c-card", { "c-card--big": film.isBig, "c-card--fill": fill }]}>
+  <div class:list={["c-card__meta", { "is-right": right }]}>
+    {number && <p class="c-card__index">[{number}]</p>}
 
-    <div class=`${right ? 'text-right' : ''}`>
-      <p class="text-[10px] opacity-60">{subTitle}</p>
-      <p
-        class=`text-[10px] uppercase truncate ${data?.isBig ? 'max-w-100' : 'max-w-50'}`
-      >
-        {data?.title}
-      </p>
+    <div>
+      {subTitle && <p class="c-card__subtitle">{subTitle}</p>}
+      <p class="c-card__title">{film.title}</p>
     </div>
   </div>
 
-  <div
-    class=`relative w-full overflow-hidden ${fill ? 'grow min-h-0' : data?.isBig ? 'min-h-115.5' : 'aspect-video min-h-50'}`
-  >
+  <div class="c-card__media">
     {
-      data?.gif && (
-        <img
-          src={data.gif}
-          alt="Loading Animation"
-          class="absolute inset-0 block w-full h-full object-cover"
-        />
+      film.gif && (
+        <img class="c-card__gif" src={film.gif} alt="" aria-hidden="true" loading="lazy" />
       )
     }
 
     <img
-      src={cdnLink}
-      alt="Project Cover"
-      class=`parallax-element absolute bottom-[-10%] left-0 w-full h-[120%] object-cover transition-opacity duration-300 ${data?.gif ? 'group-hover:opacity-0' : ''}`
+      class:list={["c-card__cover", { "has-gif": film.gif }]}
+      src={film.cover}
+      alt={film.title ?? ""}
+      loading="lazy"
     />
   </div>
 </div>
 
 <script>
+  import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
   import { initParallax } from "../../../shared/animation/parallax";
 
-  function setupParallax() {
-    const elements = document.querySelectorAll(".parallax-element");
+  /** Насколько обложка ходит внутри рамки, % своей высоты. */
+  const PARALLAX_SHIFT = 10;
 
-    if (elements.length === 0) return;
+  // Обложка и гифка до инициализации прозрачны (см. c-card.scss):
+  // так не видно рывка, когда GSAP впервые выставляет сдвиг.
+  const setupCards = () => {
+    const cards = document.querySelectorAll<HTMLElement>(".c-card");
+    if (!cards.length) return;
 
-    elements.forEach((el) => {
-      el.classList.remove("initialised");
+    for (const card of cards) {
+      const cover = card.querySelector<HTMLElement>(".c-card__cover");
+      if (cover) {
+        initParallax(cover, PARALLAX_SHIFT);
+        cover.classList.add("initialised");
+      }
 
-      initParallax(el as HTMLElement, 10);
-      el.classList.add("initialised");
-    });
+      card.querySelector(".c-card__gif")?.classList.add("initialised");
+    }
 
     ScrollTrigger.refresh();
-  }
-  document.addEventListener("astro:page-load", () => {
-    setTimeout(setupParallax, 650);
-  });
+  };
 
-  if (document.readyState === "complete") {
-    setupParallax();
-  } else {
-    window.addEventListener("load", setupParallax);
-  }
+  document.addEventListener("astro:page-load", setupCards);
 </script>

@@ -3,72 +3,96 @@ interface Props {
 	animateOnScroll?: boolean;
 	delay?: number;
 	start?: string;
+	stagger?: number;
 	className?: string;
 }
 
-const { animateOnScroll = true, delay = 0, start = "top 80%", className = "" } = Astro.props;
+const {
+	animateOnScroll = true,
+	delay = 0,
+	start = "top 80%",
+	stagger = 0.08,
+	className = "",
+} = Astro.props;
 ---
 
 <div
-  class={`text-effect-container ${className}`}
+  class:list={["c-text-effect", className]}
   data-animate={animateOnScroll}
   data-delay={delay}
   data-start={start}
+  data-stagger={stagger}
   style="visibility: visible; position: relative;"
 >
   <slot />
 </div>
 
-<style>
-  :global(.line-mask) {
-    overflow: hidden;
-  }
-</style>
-
 <script>
-  import gsap from "gsap";
-  import { SplitText } from "gsap/SplitText";
-  import { ScrollTrigger } from "gsap/ScrollTrigger";
+  import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+  import { SplitText } from "gsap/dist/SplitText";
 
   gsap.registerPlugin(ScrollTrigger, SplitText);
 
   function initAnimations() {
-    const containers = document.querySelectorAll(".text-effect-container");
+    const containers = document.querySelectorAll<HTMLElement>(
+      ".c-text-effect",
+    );
 
-    containers.forEach((container) => {
-      const target =
-        container.querySelector("h1, h2, h3, p, span") || container;
-      const delay = parseFloat(container.getAttribute("data-delay") || "0");
-      const start = container.getAttribute("data-start") || "top 80%";
+    for (const container of containers) {
+      // Без флага повторный вызов (astro:page-load после перехода) разрезал бы
+      // уже разрезанный текст — строки вкладывались бы друг в друга.
+      if (container.dataset.effectReady) continue;
+      container.dataset.effectReady = "true";
 
-      const maskSplit = new SplitText(target, {
-        type: "lines",
-        linesClass: "line-mask",
-      });
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) continue;
 
-      const textSplit = new SplitText(maskSplit.lines, {
-        type: "lines",
-      });
+      // По умолчанию — первый текстовый элемент внутри (старое поведение).
+      // Если размечены [data-split-target], анимируем их все одной волной:
+      // так один блок может собрать и лейбл, и список, и абзац.
+      const marked = [...container.querySelectorAll<HTMLElement>("[data-split-target]")];
+      const targets = marked.length
+        ? marked
+        : [container.querySelector<HTMLElement>("h1, h2, h3, p, span") ?? container];
 
-      gsap.from(textSplit.lines, {
+      const lines: Element[] = [];
+
+      for (const target of targets) {
+        const maskSplit = new SplitText(target, {
+          type: "lines",
+          linesClass: "line-mask",
+        });
+        const textSplit = new SplitText(maskSplit.lines, { type: "lines" });
+        lines.push(...textSplit.lines);
+      }
+
+      if (!lines.length) continue;
+
+      // animateOnScroll={false} — играем сразу, без привязки к скроллу.
+      // Раньше проп принимался, но ни на что не влиял.
+      const onScroll = container.dataset.animate !== "false";
+
+      gsap.from(lines, {
         yPercent: 100,
         autoAlpha: 0,
-        stagger: 0.08,
+        stagger: parseFloat(container.dataset.stagger || "0.08"),
         duration: 0.8,
         ease: "power3.out",
-        delay: delay,
-        scrollTrigger: {
-          trigger: target,
-          start: start,
-          once: true,
-        },
+        delay: parseFloat(container.dataset.delay || "0"),
+        scrollTrigger: onScroll
+          ? {
+              trigger: container,
+              start: container.dataset.start || "top 80%",
+              once: true,
+            }
+          : undefined,
       });
-    });
+    }
   }
 
-  document.fonts.ready.then(() => {
-    initAnimations();
-  });
+  // SplitText меряет реальные переносы строк, поэтому ждём шрифты:
+  // до их загрузки метрики другие и строки разъедутся.
+  const runAnimations = () => document.fonts.ready.then(initAnimations);
 
-  document.addEventListener("astro:after-swap", initAnimations);
+  document.addEventListener("astro:page-load", runAnimations);
 </script>

@@ -1,0 +1,70 @@
+@use "../abstracts" as *;
+
+// ---- Лоадер и появление контента ----
+// Пока играет заставка, контент скрыт. Класс is-loading ставит
+// inline-скрипт в Loader.astro — только при первом заходе за сессию
+// и только если заставка есть. Без гифки в студии, на повторных
+// заходах и без JS контент виден сразу, а заставки нет.
+.is-loading #main-content {
+  opacity: 0;
+}
+
+// ---- Переход между страницами ----
+// Снимки страниц привязываем к экрану: иначе при длинной странице
+// анимация считает координаты от всей её высоты и уезжает.
+::view-transition-old(root),
+::view-transition-new(root) {
+  height: 100vh !important;
+  width: 100vw !important;
+  object-fit: cover;
+  object-position: top;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+  animation: page-leave 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+  animation: page-enter 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-group(root) {
+  animation-duration: 1s;
+  // Фиксируем контейнер анимации в окне, чтобы прокрутка не влияла на координаты.
+  position: fixed;
+  inset: 0;
+}
+
+@keyframes page-enter {
+  0% {
+    transform: translateY(120%) rotate(-2deg) scaleY(0.4) scale(1.2);
+  }
+
+  10% {
+    transform: translateY(100%) rotate(-2deg) scaleY(0.4) scale(1.2);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-leave {
+  0%,
+  10% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-120%) rotate(2deg) scaleY(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

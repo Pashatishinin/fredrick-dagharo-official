@@ -1,47 +1,60 @@
-<div id="loader">
-  <img src="/loading2.gif" alt="Loading..." />
-</div>
+---
+import { fetchLoaderData } from "../../../entities";
 
-<style>
-  #loader {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #010101;
-    z-index: 999999;
-  }
+/**
+ * Заставка при первом заходе за сессию. Гифка и длительность — из Site
+ * Loader в студии. Нет гифки — нет заставки: контент виден сразу.
+ */
+const { gif, duration } = await fetchLoaderData();
 
-  #loader img {
-    height: 100%;
-    width: auto;
-    object-fit: cover;
-  }
-</style>
+/** Сколько секунд заставка гаснет. */
+const FADE = 0.8;
+
+// Первая анимация страницы (например, заголовок About) ждёт, пока
+// заставка погаснет; с небольшим запасом.
+const heroDelay = duration + FADE + 0.2;
+---
+
+{
+  gif && (
+    <>
+      {/*
+        Выполняется синхронно, до того как отрисуется контент ниже:
+        решает, играть ли заставку, и прячет контент только если играет.
+        LOADER_SEEN живёт в window и переживает переходы по сайту —
+        заставка не всплывёт снова, даже если она ещё не успела
+        записать флаг в sessionStorage.
+      */}
+      <script is:inline define:vars={{ heroDelay }}>
+        const root = document.documentElement;
+        let seen = window.LOADER_SEEN === true;
+        try {
+          seen = seen || sessionStorage.getItem("hasLoaded") === "true";
+        } catch {}
+        window.LOADER_SEEN = true;
+
+        if (seen) {
+          window.HERO_DELAY = 0.2;
+        } else {
+          root.classList.add("is-loading");
+          window.HERO_DELAY = heroDelay;
+        }
+      </script>
+
+      <div id="loader" class="c-loader" data-duration={duration} data-fade={FADE}>
+        <img class="c-loader__media" src={gif} alt="" fetchpriority="high" />
+      </div>
+    </>
+  )
+}
 
 <script>
-  import { gsap } from "gsap";
+  import { playLoader } from "./loader";
 
-  const initLoader = () => {
-    const loader = document.getElementById("loader");
-    const main = document.getElementById("main-content");
+  document.addEventListener("astro:page-load", playLoader);
 
-    if (!loader || !main) return;
-
-    const tl = gsap.timeline();
-
-    tl.to({}, { duration: 3 })
-      .to(loader, { scale: 1.5, duration: 0.5 })
-      .to(loader, {
-        opacity: 0,
-        duration: 0.5,
-        onComplete: () => {
-          loader.style.display = "none";
-        },
-      })
-      .to(main, { opacity: 1, duration: 0.8, ease: "power2.inOut" });
-  };
-
-  initLoader();
+  // Модуль ждёт загрузки gsap и может выполниться уже ПОСЛЕ того, как
+  // ClientRouter разослал astro:page-load — тогда добиваем вызовом
+  // напрямую. Повторный запуск защищён флагом внутри playLoader.
+  if (document.readyState !== "loading") playLoader();
 </script>

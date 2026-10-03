@@ -1,0 +1,32 @@
+---
+import type { Image } from "../../entities";
+
+/**
+ * Логотип сайта из Site Settings: картинка, если её загрузили, иначе
+ * текст построчно. Один на шапку и футер — различаются только классы.
+ * Доступное имя задаёт ссылка-обёртка (aria-label), поэтому alt пустой.
+ */
+interface Props {
+	lines: string[];
+	image: Image;
+	lineClass: string;
+	imageClass: string;
+}
+
+const { lines, image, lineClass, imageClass } = Astro.props;
+---
+
+{
+  image.url ? (
+    <img
+      class={imageClass}
+      src={image.url}
+      alt=""
+      width={image.width}
+      height={image.height}
+      decoding="async"
+    />
+  ) : (
+    lines.map((line) => <span class={lineClass}>{line}</span>)
+  )
+}

@@ -1,0 +1,88 @@
+@use "../abstracts" as *;
+
+// mix-blend-mode: difference — шапка сама инвертируется поверх любого кадра,
+// поэтому она читается и на светлом видео, и на чёрном фоне.
+.c-header {
+  position: fixed;
+  top: 0;
+  z-index: 99999;
+  width: 100%;
+  max-width: $layout-max;
+  padding-block: 1rem;
+  mix-blend-mode: difference;
+  // Шапка перекрывает весь экран по ширине, поэтому сквозь неё должно
+  // кликаться всё, кроме самих ссылок.
+  pointer-events: none;
+
+  @include gutters;
+}
+
+.c-header__inner {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  // На телефоне логотип уходит вправо, меню — влево.
+  flex-direction: row-reverse;
+
+  @include from(sm) {
+    flex-direction: row;
+  }
+}
+
+.c-header__logo {
+  pointer-events: auto;
+}
+
+// Строка текстового логотипа: засечная с плотным трекингом — та же
+// метрика, что у логотипа в футере.
+.c-header__logo-line {
+  display: block;
+  font-family: $font-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: -0.1em;
+  line-height: 80%;
+}
+
+// Картинка-логотип занимает ту же высоту, что две строки текста.
+.c-header__logo-image {
+  display: block;
+  width: auto;
+  height: 2rem;
+}
+
+.c-header__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  @include from(sm) {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+.c-header__link {
+  pointer-events: auto;
+  font-size: 12px;
+
+  @include from(sm) {
+    font-size: 14px;
+  }
+
+  // Ссылка на текущую страницу: гасим и убираем из-под курсора.
+  &.is-current {
+    pointer-events: none;
+    opacity: 0.4;
+  }
+}
+
+.c-header__clock {
+  display: none;
+  font-size: 10px;
+  font-weight: 500;
+
+  @include from(sm) {
+    display: block;
+  }
+}

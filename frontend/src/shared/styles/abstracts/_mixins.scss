@@ -1,0 +1,54 @@
+@use "sass:map";
+@use "tokens" as *;
+
+/// Медиазапрос «от указанного брейкпоинта и шире».
+/// @example scss
+///   .c-block { @include from(sm) { padding-inline: $gutter-lg; } }
+@mixin from($name) {
+  $size: map.get($bp, $name);
+
+  @if $size == null {
+    @error "Неизвестный брейкпоинт `#{$name}`. Есть: #{map.keys($bp)}.";
+  }
+
+  @media (min-width: $size) {
+    @content;
+  }
+}
+
+/// Медиазапрос «уже указанного брейкпоинта».
+/// Парный к from(): границы не пересекаются, поэтому правила
+/// to(md) и from(md) никогда не действуют одновременно.
+/// @example scss
+///   .c-block { @include to(md) { display: none; } }
+@mixin to($name) {
+  $size: map.get($bp, $name);
+
+  @if $size == null {
+    @error "Неизвестный брейкпоинт `#{$name}`. Есть: #{map.keys($bp)}.";
+  }
+
+  @media (max-width: #{$size - 0.02px}) {
+    @content;
+  }
+}
+
+/// Боковые поля страницы — одни и те же во всех секциях.
+@mixin gutters {
+  padding-inline: $gutter;
+
+  @include from(sm) {
+    padding-inline: $gutter-lg;
+  }
+}
+
+/// Мелкий служебный лейбл: [ ABOUT ], [ TOP ], пункты меню.
+@mixin label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  @include from(sm) {
+    font-size: 11px;
+  }
+}

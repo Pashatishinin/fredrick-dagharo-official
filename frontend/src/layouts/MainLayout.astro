@@ -1,18 +1,28 @@
 ---
-import Header from "../views/header/Header.astro";
-import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import DecodeText from "../components/animations/DecodeText.astro";
 import CustomCursor from "../components/ui/custom-cursor/CustomCursor.astro";
 import Loader from "../components/ui/loader/Loader.astro";
+import { fetchSiteSettings } from "../entities";
+import { SITE_TITLE } from "../shared/config/titles";
 import FooterSection from "../views/footer/FooterSection.astro";
+import Header from "../views/header/Header.astro";
+import "../shared/styles/main.scss";
 
 interface Props {
 	title?: string;
+	description?: string;
 }
 
-const { title } = Astro.props;
-const pageTitle = title ? `${title} — Fredrick Dagharo` : "Fredrick Dagharo";
+const { title, description } = Astro.props;
+
+// SEO по умолчанию — из Site Settings: его title дописывается к заголовку
+// каждой страницы (пусто → заглушка SITE_TITLE), description берётся,
+// если у страницы своего нет.
+const { seo: siteSeo } = await fetchSiteSettings();
+const siteTitle = siteSeo.title || SITE_TITLE;
+const pageTitle = title ? `${title} — ${siteTitle}` : siteTitle;
+const pageDescription = description || siteSeo.description;
 ---
 
 <!doctype html>
@@ -20,8 +30,29 @@ const pageTitle = title ? `${title} — Fredrick Dagharo` : "Fredrick Dagharo";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
+    {pageDescription && <meta name="description" content={pageDescription} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    {pageDescription && <meta property="og:description" content={pageDescription} />}
     <link rel="icon" href="/favicon.ico" />
+
+    <!-- Видео на сайте живёт на vimeo: заранее открываем соединения,
+         чтобы плеер не тратил время на DNS + TLS в момент старта. -->
+    <link rel="preconnect" href="https://player.vimeo.com" />
+    <link rel="preconnect" href="https://i.vimeocdn.com" />
+    <link rel="preconnect" href="https://f.vimeocdn.com" crossorigin />
+
+    <!-- Шрифты подключаем ссылками, а не @import внутри CSS: @import
+         выстраивал цепочку — сначала скачать стиль, только потом узнать
+         про шрифт, — и задерживал первую отрисовку заголовков. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap"
+    />
     <link rel="stylesheet" href="https://use.typekit.net/bef2bdy.css" />
+
     <meta name="generator" content={Astro.generator} />
 
     <script src="../shared/lib/gsap-init.ts"></script>
@@ -29,32 +60,15 @@ const pageTitle = title ? `${title} — Fredrick Dagharo` : "Fredrick Dagharo";
     <title>{pageTitle}</title>
 
     <script is:inline>
-      function initLoaderState() {
-        const hasLoaded = sessionStorage.getItem("hasLoaded");
-        if (hasLoaded === "true") {
-          document.documentElement.classList.add("loader-visited");
-          window.HERO_DELAY = 0.2;
-        } else {
-          window.HERO_DELAY = 3.5; // Время работы вашего лоадера
-        }
-      }
-      initLoaderState();
-
       document.addEventListener("astro:before-swap", () => {
-        // Сбрасываем скролл ДО того, как страницы поменяются местами
+        // Сбрасываем прокрутку ДО того, как страницы поменяются местами.
         window.scrollTo(0, 0);
       });
 
       document.addEventListener("astro:after-swap", () => {
         window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-        document.body.scrollTo({ top: 0, left: 0, behavior: "instant" });
-        document.documentElement.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: "instant",
-        });
-
-        document.documentElement.classList.add("loader-visited");
+        // При переходе по сайту заставки нет — первая анимация
+        // новой страницы стартует почти сразу.
         window.HERO_DELAY = 0.2;
       });
     </script>
@@ -63,193 +77,38 @@ const pageTitle = title ? `${title} — Fredrick Dagharo` : "Fredrick Dagharo";
     <Loader />
     <CustomCursor />
     <Header transition:name="hero" transition:persist />
+
     <main id="main-content">
       <slot />
       <FooterSection />
     </main>
-    <div
+
+    <button
       id="scroll-top-btn"
-      role="button"
-      tabindex="0"
+      type="button"
       aria-label="Scroll to top"
       transition:persist
-      class="fixed bottom-16 left-4 sm:left-16 z-100000 opacity-0 pointer-events-none transition-opacity duration-300"
+      class="c-scroll-top"
     >
-      <span class="flex gap-2 text-[14px]">
-        [
-        <DecodeText>TOP</DecodeText> ]</span
-      >
-    </div>
+      [ <DecodeText as="span">TOP</DecodeText> ]
+    </button>
   </body>
 </html>
 
-<style is:global>
-  @import url("https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
-  /* Если лоадер уже был — скрываем его мгновенно через CSS */
-
-  h1,
-  h5 {
-    font-family: "Averia Serif Libre", serif;
-    font-weight: 500;
-    font-style: normal;
-    letter-spacing: -0.1em;
-    line-height: 80%;
-  }
-  .loader-visited #loader {
-    display: none !important;
-  }
-
-  /* Если лоадер уже был — контент виден сразу */
-  .loader-visited #main-content {
-    opacity: 1 !important;
-  }
-
-  /* Начальное состояние для первого захода */
-  #main-content {
-    opacity: 0;
-  }
-
-  /* Ваши стили переходов */
-  ::view-transition-old(root) {
-    animation: slide-down 1s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
-  }
-  ::view-transition-new(root) {
-    z-index: 2;
-    animation: slide-up 1s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  @keyframes slide-up {
-    0% {
-      transform: translateY(120%) rotate(-2deg) scaleY(0.4) scale(1.2);
-    }
-
-    10% {
-      transform: translateY(100%) rotate(-2deg) scaleY(0.4) scale(1.2);
-    }
-    100% {
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slide-down {
-    0% {
-      transform: translateY(0);
-    }
-
-    10% {
-      transform: translateY(0);
-    }
-    100% {
-      transform: translateY(-120%) rotate(2deg) scaleY(0.6);
-    }
-  }
-
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    min-height: 100%;
-    background-color: #090909;
-    color: #f9f9f9;
-    max-width: 1920px;
-    margin: auto;
-    font-family: "Space Grotesk", sans-serif;
-  }
-
-  html {
-    overflow-anchor: none !important;
-    scroll-behavior: auto !important;
-  }
-
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    /* Заставляем снимки страниц быть строго по размеру экрана */
-    height: 100vh !important;
-    width: 100vw !important;
-    object-fit: cover;
-    object-position: top; /* Всегда показываем верх снимка */
-  }
-
-  ::view-transition-group(root) {
-    animation-duration: 1s;
-    /* Фиксируем контейнер анимации в окне, чтобы скролл не влиял на координаты */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
-</style>
-
 <script>
-  import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
   import { gsap } from "gsap";
+  import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
   if (typeof window !== "undefined" && history.scrollRestoration) {
     history.scrollRestoration = "manual";
   }
-
-  // 3. Подготовка DOM перед показом новой страницы
-
-  // 4. Основной цикл загрузки
-
-  function handleLoader() {
-    const loader = document.getElementById("loader");
-    const mainContent = document.getElementById("main-content");
-
-    if (!document.documentElement.classList.contains("loader-visited")) {
-      if (loader && mainContent) {
-        const tl = gsap.timeline({
-          onComplete: () => {
-            sessionStorage.setItem("hasLoaded", "true");
-            document.documentElement.classList.add("loader-visited");
-            loader.style.display = "none";
-          },
-        });
-
-        tl.to(loader, { opacity: 0, duration: 0.8, delay: 2.5 }).to(
-          mainContent,
-          { opacity: 1, duration: 0.5 },
-          "-=0.4",
-        );
-      }
-    }
-  }
-
-  document.addEventListener("astro:page-load", () => {
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-    });
-    handleLoader();
-
-    setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 650);
-  });
-
-  document.addEventListener("astro:before-preparation", (ev: any) => {
-    ev.detail.formData = null;
-    ScrollTrigger.getAll().forEach((t) => t.kill());
-    gsap.killTweensOf("*");
-  });
-
-  document.addEventListener("astro:after-swap", () => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  });
 
   function setupScrollTopBtn() {
     const btn = document.getElementById("scroll-top-btn");
     if (!btn || btn.dataset.initialized) return;
     btn.dataset.initialized = "true";
 
-    const onScroll = () => {
-      const visible = window.scrollY > 300;
-      btn.style.opacity = visible ? "1" : "0";
-      btn.style.pointerEvents = visible ? "auto" : "none";
-    };
+    const onScroll = () => btn.classList.toggle("is-visible", window.scrollY > 300);
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -259,6 +118,26 @@ const pageTitle = title ? `${title} — Fredrick Dagharo` : "Fredrick Dagharo";
     });
   }
 
-  document.addEventListener("astro:page-load", setupScrollTopBtn);
-  setupScrollTopBtn();
+  const onPageLoad = () => {
+    requestAnimationFrame(() => window.scrollTo(0, 0));
+    setupScrollTopBtn();
+    setTimeout(() => ScrollTrigger.refresh(), 650);
+  };
+
+  document.addEventListener("astro:page-load", onPageLoad);
+
+  // Модуль ждёт загрузки gsap и может выполниться уже ПОСЛЕ того, как
+  // ClientRouter разослал astro:page-load — тогда добиваем напрямую.
+  if (document.readyState !== "loading") onPageLoad();
+
+  // Перед уходом со страницы гасим всё, что крутит GSAP: иначе триггеры
+  // остаются висеть на уже удалённых узлах.
+  document.addEventListener("astro:before-preparation", () => {
+    ScrollTrigger.getAll().forEach((t) => t.kill());
+    gsap.killTweensOf("*");
+  });
+
+  document.addEventListener("astro:after-swap", () => {
+    window.scrollTo(0, 0);
+  });
 </script>

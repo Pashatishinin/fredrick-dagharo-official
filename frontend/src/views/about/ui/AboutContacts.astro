@@ -1,0 +1,33 @@
+---
+import DecodeText from "../../../components/animations/DecodeText.astro";
+import type { ContactLink } from "../../../entities";
+import AboutRow from "./AboutRow.astro";
+
+interface Props {
+	links: ContactLink[];
+}
+
+const { links } = Astro.props;
+---
+
+<AboutRow label="CONTACTS" modifier="contacts" stagger={0.04}>
+  <ul class="c-about__body c-about__contacts">
+    {
+      links.map((link) => (
+        <li class="c-about__contact">
+          <span class="c-about__contact-kind" data-split-target>
+            {link.label}
+          </span>
+          <a
+            class="c-about__contact-link"
+            href={link.href}
+            data-split-target
+            {...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
+          >
+            <DecodeText as="span" duration={1} class="c-about__contact-decode" text={link.value} />
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</AboutRow>

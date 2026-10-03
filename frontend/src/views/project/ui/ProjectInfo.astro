@@ -1,0 +1,50 @@
+---
+import TextEffect from "../../../components/animations/TextEffect.astro";
+import type { Film } from "../../../entities";
+
+interface Props {
+	film: Film;
+}
+
+const { film } = Astro.props;
+
+// Строка без значения не рисуется: иначе в таблице остаётся пустая линейка.
+const meta = [
+	{ label: "Client", value: film.client },
+	{ label: "Role", value: film.role },
+	{ label: "Year", value: film.year },
+	{ label: "Location", value: film.city },
+].filter((row): row is { label: string; value: string } => Boolean(row.value?.trim()));
+---
+
+<section class="c-project-info">
+  <TextEffect className="c-project-info__summary">
+    {/* Название уже крупно стоит в hero — здесь оно только подпись */}
+    <h2 class="c-project-info__title" data-split-target>{film.title}</h2>
+
+    {
+      film.info && (
+        <p class="c-project-info__lead" data-split-target>
+          {film.info}
+        </p>
+      )
+    }
+  </TextEffect>
+
+  {
+    meta.length > 0 && (
+      <TextEffect className="c-project-info__aside" stagger={0.06}>
+        <dl class="c-project-info__meta">
+          {meta.map((row) => (
+            <div class="c-project-info__row">
+              <dt class="c-project-info__label">{row.label}</dt>
+              <dd class="c-project-info__value">
+                <span data-split-target>{row.value}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </TextEffect>
+    )
+  }
+</section>

@@ -1,0 +1,118 @@
+@use "../abstracts" as *;
+
+/* ============================================================
+   PROJECT — INFO
+
+   Две колонки: слева название и описание, справа таблица фактов
+   (Client / Role / Year / Location). На макете правый блок стартует
+   примерно с двух третей ширины, поэтому сетка на 12 колонок:
+   слева 1–6, справа 8–12.
+
+   Главный по кеглю здесь абзац, а не название: название уже занимает
+   весь экран в hero, дублировать его крупно незачем. Кегли сняты
+   с макета в долях от ширины страницы — везде clamp(), чтобы на 375
+   и на 1920 пропорции совпадали.
+   ============================================================ */
+
+.c-project-info {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 1rem;
+  row-gap: clamp(2.5rem, 5vw, 4rem);
+  padding-inline: $gutter;
+  padding-block: clamp(3rem, 6vw, 5.5rem);
+}
+
+/* Линейка под секцией не должна доходить до края экрана — она живёт
+   внутри тех же полей, что и контент, поэтому не border, а псевдоэлемент. */
+.c-project-info::after {
+  content: "";
+  position: absolute;
+  inset-inline: $gutter;
+  bottom: 0;
+  height: 1px;
+  background: $color-line;
+}
+
+@include from(sm) {
+  .c-project-info {
+    padding-inline: $gutter-lg;
+  }
+
+  .c-project-info::after {
+    inset-inline: $gutter-lg;
+  }
+}
+
+/* ---- Колонки ---- */
+
+.c-project-info__summary,
+.c-project-info__aside {
+  grid-column: 1 / -1;
+}
+
+@include from(md) {
+  .c-project-info__summary {
+    grid-column: 1 / span 7;
+  }
+
+  .c-project-info__aside {
+    grid-column: 9 / -1;
+  }
+}
+
+/* ---- Левая колонка ---- */
+
+/* Название проекта во весь экран стоит в hero (72px), поэтому здесь оно
+   не заголовок, а подпись. Акцент держим цветом и трекингом, а не кеглем:
+   полная яркость против приглушённого абзаца читается как акцент,
+   но 15px рядом с 72px в hero ни с чем не конкурируют. */
+.c-project-info__title {
+  margin: 0 0 clamp(1.25rem, 1.8vw, 1.75rem);
+  font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $color-text;
+}
+
+.c-project-info__lead {
+  margin: 0;
+  font-size: clamp(1rem, 1.8vw, 1.75rem);
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  color: rgba($color-text, 0.55);
+}
+
+/* ---- Правая колонка ---- */
+
+.c-project-info__meta {
+  margin: 0;
+  border-top: 1px solid $color-line;
+}
+
+.c-project-info__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: clamp(0.65rem, 0.9vw, 0.95rem);
+  border-bottom: 1px solid $color-line;
+}
+
+.c-project-info__label {
+  margin: 0;
+  font-size: clamp(0.875rem, 1.25vw, 1.25rem);
+  line-height: 1.4;
+  color: rgba($color-text, 0.4);
+}
+
+.c-project-info__value {
+  margin: 0;
+  font-size: clamp(0.875rem, 1.25vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: right;
+}

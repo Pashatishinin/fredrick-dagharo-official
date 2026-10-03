@@ -1,0 +1,94 @@
+@use "../abstracts" as *;
+
+/* Архив (/index): все фильмы списком, гифка всплывает при наведении. */
+
+.c-archive {
+  min-height: 100vh;
+  padding-inline: $gutter;
+  padding-block: 4rem;
+
+  @include from(sm) {
+    padding: $gutter-lg;
+  }
+}
+
+.c-archive__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 1rem;
+  padding-block: 4rem;
+
+  @include from(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: $gutter-lg;
+  }
+
+  @include from(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include from(lg) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.c-archive__item {
+  position: relative;
+}
+
+.c-archive__row {
+  position: relative;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
+  min-height: 2.5rem;
+  font-size: 10px;
+}
+
+.c-archive__index {
+  grid-column: span 1;
+}
+
+.c-archive__title {
+  grid-column: span 3;
+  max-width: 300px;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.c-archive__year {
+  grid-column: span 1;
+  text-align: right;
+}
+
+// Превью всплывает по центру экрана при наведении на строку.
+.c-archive__preview {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+
+  .c-archive__item:hover & {
+    opacity: 1;
+  }
+}
+
+.c-archive__preview-img {
+  display: block;
+  width: min(500px, 80vw);
+  height: auto;
+  object-fit: cover;
+}
+
+// Без мыши превью не нужно: после тапа :hover «залипает»,
+// и гифка висела бы поверх списка.
+@media (hover: none) {
+  .c-archive__preview {
+    display: none;
+  }
+}

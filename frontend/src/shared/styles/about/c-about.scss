@@ -1,0 +1,99 @@
+@use "../abstracts" as *;
+
+/* ============================================================
+   ABOUT — каркас страницы: отступы, сетка, лейблы, основной набор.
+   Блоки (hero, портрет, услуги, шоурил, клиенты, контакты) лежат
+   рядом, в c-about-*.scss, и опираются на переменные отсюда.
+
+   Сетка: 12 колонок внутри падингов секции.
+     · лейбл   — колонки 1–4
+     · контент — колонки 6–12 (в макете правая колонка стартует ~45%)
+   На мобильном всё схлопывается в одну колонку: лейбл строкой сверху.
+
+   Вертикальный ритм и кегли сняты с макета в долях от ширины страницы,
+   поэтому везде clamp(): на 375 и на 1920 пропорции сохраняются.
+   ============================================================ */
+
+.c-about {
+  --about-pad: #{$gutter};
+  --about-gap: 1rem;
+
+  /* вертикальные интервалы между блоками */
+  --about-space-hero: clamp(4rem, 12vw, 10.5rem);
+  --about-space-lg: clamp(3rem, 8.5vw, 7.5rem);
+  --about-space-md: clamp(2.5rem, 4.5vw, 4rem);
+  --about-space-sm: clamp(2.25rem, 4vw, 3.5rem);
+
+  padding-inline: var(--about-pad);
+  padding-top: 8rem;
+  padding-bottom: clamp(4rem, 7vw, 6rem);
+}
+
+/* ---- Сетка ---- */
+
+.c-about__grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--about-gap);
+  row-gap: 0.85rem;
+}
+
+.c-about__label,
+.c-about__body {
+  grid-column: 1 / -1;
+}
+
+/* ---- Типографика ---- */
+
+/* Служебный лейбл: [ ABOUT ], [ SERVICE ], [ CLIENTS ], [ CONTACTS ] */
+.c-about__label {
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin: 0;
+}
+
+/* Основной набор: био и список услуг — один кегль, как в макете */
+.c-about__body {
+  font-size: clamp(0.9375rem, 1.1vw, 1.0625rem);
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+.c-about__bio {
+  max-width: 62ch;
+}
+
+/* ---- Ряды ---- */
+
+.c-about__row {
+  margin-top: var(--about-space-md);
+}
+
+/* Первый ряд после портрета отбит сильнее — так в макете */
+.c-about__media + .c-about__row {
+  margin-top: var(--about-space-lg);
+}
+
+/* ---- От планшета: раскладываем по колонкам ---- */
+
+@include from(sm) {
+  .c-about {
+    --about-pad: #{$gutter-lg};
+    --about-gap: 2rem;
+
+    padding-top: 11rem;
+  }
+
+  .c-about__label {
+    font-size: 12px;
+    grid-column: 1 / span 4;
+  }
+
+  .c-about__body {
+    grid-column: 6 / -1;
+  }
+}

@@ -1,7 +1,6 @@
 // @ts-check
 
 import sanity from "@sanity/astro";
-import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import { loadEnv } from "vite";
 
@@ -19,12 +18,25 @@ export default defineConfig({
 				allow: [".."],
 			},
 		},
-		plugins: [tailwindcss()],
 		ssr: {
 			noExternal: ["gsap"],
 		},
 		optimizeDeps: {
-			include: ["gsap", "gsap/ScrollTrigger"],
+			// Перечислять надо РОВНО те пути, которые импортирует код.
+			// Здесь стояло "gsap/ScrollTrigger", а импортируется
+			// "gsap/dist/ScrollTrigger" — из-за этого плагины не попадали
+			// в предсборку, vite находил их уже на лету и пересобирал
+			// зависимости прямо во время работы. Браузер в этот момент
+			// получал 504 Outdated Optimize Dep, модуль не грузился,
+			// и секция оставалась без обработчиков.
+			include: [
+				"gsap",
+				"gsap/dist/ScrollTrigger",
+				"gsap/dist/ScrollToPlugin",
+				"gsap/dist/SplitText",
+				"gsap/dist/Flip",
+				"gsap/dist/CustomEase",
+			],
 		},
 	},
 	integrations: [

@@ -1,0 +1,35 @@
+---
+import DecodeText from "../../../components/animations/DecodeText.astro";
+import type { Film } from "../../../entities";
+import { formatIndex } from "../../../shared/utils/format";
+
+interface Props {
+	film: Film;
+	index: number;
+}
+
+const { film, index } = Astro.props;
+---
+
+<div class="c-archive__item" data-archive-item>
+  <div class="c-archive__row">
+    <p class="c-archive__index">[{formatIndex(index)}]</p>
+
+    <div class="c-archive__title">
+      <a href={`/projects/${film.slug}`}>
+        <DecodeText as="span" duration={1}>{film.title}</DecodeText>
+      </a>
+    </div>
+
+    <p class="c-archive__year">{film.year}</p>
+  </div>
+
+  {
+    film.gif && (
+      <div class="c-archive__preview" aria-hidden="true">
+        {/* src подставляется при первом наведении — см. ArchiveSection */}
+        <img class="c-archive__preview-img" data-src={film.gif} alt="" decoding="async" />
+      </div>
+    )
+  }
+</div>

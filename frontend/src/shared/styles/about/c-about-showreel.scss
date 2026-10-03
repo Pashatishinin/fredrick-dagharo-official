@@ -1,0 +1,69 @@
+@use "../abstracts" as *;
+
+/* ---- Шоурил: во всю ширину, вне падингов секции ----
+
+   Рамка чуть ниже 16:9 — в макете полоса примерно такая же.
+   Именно этот зазор по высоте и отрабатывает параллакс, поэтому
+   видео никак не обрезается по бокам. Чем ниже полоса относительно
+   16:9, тем больше запас и тем свободнее ход — это единственная
+   ручка: сила параллакса считается из неё автоматически. */
+.c-about__showreel {
+  --showreel-ratio: 2.8;
+
+  position: relative;
+  margin-top: var(--about-space-sm);
+  margin-inline: calc(var(--about-pad) * -1);
+  aspect-ratio: var(--showreel-ratio);
+  overflow: hidden;
+  background-color: $color-bg-elevated;
+}
+
+/* Медиа держим строго 16:9, иначе плеер добавит чёрные поля.
+   По высоте оно выходит за рамку — этот запас и сдвигает GSAP.
+
+   Центруем ИМЕННО через margin-top, не через translate: GSAP, когда
+   берёт элемент в работу, пишет ему translate/rotate/scale: none,
+   чтобы не складывать их со своим transform, — и любое центрирование
+   на translate просто стёрлось бы при первом кадре параллакса.
+   Процент в margin считается от ШИРИНЫ родителя, а высота медиа —
+   это 9/16 той же ширины, поэтому -100% * 9/16 / 2 = ровно полвысоты. */
+.c-about__showreel-media {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-top: calc(-100% * 9 / 16 / 2);
+  will-change: transform;
+}
+
+/* Постер и плеер лежат друг на друге */
+.c-about__showreel-poster,
+.c-about__showreel-frame {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.c-about__showreel-poster {
+  object-fit: cover;
+}
+
+/* Видео проявляем только когда плеер реально загрузился */
+.c-about__showreel-frame {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+.c-about__showreel.is-ready .c-about__showreel-frame {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-about__showreel-frame {
+    transition: none;
+  }
+}

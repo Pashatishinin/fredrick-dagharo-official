@@ -1,0 +1,23 @@
+@use "../abstracts" as *;
+
+// Футер выезжает из-под контента: дорожка выше экрана на 100vh и подтянута
+// вверх, внутри — липкий блок. Из-за clip-path контент не вылезает за рамку
+// во время выезда.
+.c-footer {
+  position: relative;
+  z-index: 30;
+  height: 800px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.c-footer__track {
+  position: relative;
+  top: -100vh;
+  height: calc(100vh + 800px);
+}
+
+.c-footer__sticky {
+  position: sticky;
+  top: calc(100vh - 800px);
+  height: 800px;
+}

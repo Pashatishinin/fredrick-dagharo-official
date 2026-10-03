@@ -1,0 +1,63 @@
+---
+import type { About, Contacts } from "../../entities";
+import AboutContacts from "./ui/AboutContacts.astro";
+import AboutHero from "./ui/AboutHero.astro";
+import AboutPortrait from "./ui/AboutPortrait.astro";
+import AboutRow from "./ui/AboutRow.astro";
+import AboutServices from "./ui/AboutServices.astro";
+import AboutShowreel from "./ui/AboutShowreel.astro";
+
+/**
+ * Страница About целиком. Данные приходят от страницы — она же берёт
+ * из них SEO. Запасных значений нет: незаполненный в студии блок
+ * просто не выводится.
+ */
+interface Props {
+	about: About;
+	contacts: Contacts;
+}
+
+const { about, contacts } = Astro.props;
+---
+
+<section class="c-about">
+  {about.mark.length > 0 && <AboutHero lines={about.mark} />}
+
+  {
+    about.portrait.url && (
+      <AboutPortrait image={about.portrait} hoverSrc={about.portraitHover.url} />
+    )
+  }
+
+  {
+    about.bio && (
+      <AboutRow label="ABOUT">
+        <p class="c-about__body c-about__bio" data-split-target>
+          {about.bio}
+        </p>
+      </AboutRow>
+    )
+  }
+
+  {about.services.length > 0 && <AboutServices services={about.services} />}
+
+  {about.showreel.vimeoId && <AboutShowreel showreel={about.showreel} />}
+
+  {
+    about.clients.length > 0 && (
+      <AboutRow label="CLIENTS" modifier="clients">
+        <p class="c-about__body c-about__clients" data-split-target>
+          {about.clients.join(", ")}
+        </p>
+      </AboutRow>
+    )
+  }
+
+  {contacts.links.length > 0 && <AboutContacts links={contacts.links} />}
+</section>
+
+<script>
+  import { initAboutIntro } from "./lib/intro";
+
+  document.addEventListener("astro:page-load", initAboutIntro);
+</script>

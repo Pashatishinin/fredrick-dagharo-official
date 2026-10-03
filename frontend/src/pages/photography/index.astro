@@ -1,8 +1,19 @@
 ---
+import { fetchPhotographyData } from "../../entities";
 import MainLayout from "../../layouts/MainLayout.astro";
-import PhotographySection from "../../views/photography/photography-section/PhotographySection.astro";
+import { PAGE_TITLES } from "../../shared/config/titles";
+import PhotographySection from "../../views/photography/PhotographySection.astro";
+
+const { seo, photos } = await fetchPhotographyData();
+
+if (!photos.length) {
+	console.warn("[photography] В Sanity нет снимков в наборах Photography");
+}
 ---
 
-<MainLayout>
-  <PhotographySection />
+<MainLayout
+  title={seo.title || PAGE_TITLES.photography}
+  description={seo.description || undefined}
+>
+  <PhotographySection photos={photos} />
 </MainLayout>

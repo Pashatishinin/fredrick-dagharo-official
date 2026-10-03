@@ -1,13 +1,16 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import { fetchHomeData } from "../entities";
 import MainLayout from "../layouts/MainLayout.astro";
-import GallerySection from "../views/home/gallery-section/GallerySection.astro";
-import Welcome from "../views/Welcome.astro";
+import { PAGE_TITLES } from "../shared/config/titles";
+import HomeSection from "../views/home/HomeSection.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const { seo, films } = await fetchHomeData();
+
+if (!films.length) {
+	console.warn("[home] В Sanity нет опубликованных фильмов с отметкой Selected Film");
+}
 ---
 
-<MainLayout title="Selected Works">
-  <GallerySection />
+<MainLayout title={seo.title || PAGE_TITLES.home} description={seo.description || undefined}>
+  <HomeSection films={films} />
 </MainLayout>

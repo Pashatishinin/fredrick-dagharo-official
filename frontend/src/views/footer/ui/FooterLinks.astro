@@ -1,0 +1,48 @@
+---
+import DecodeText from "../../../components/animations/DecodeText.astro";
+import type { Link } from "../../../entities";
+
+/** Колонка ссылок футера: соцсети или карта сайта. */
+interface Props {
+	title: string;
+	links: Link[];
+	/** Ссылки на страницы сайта: текущая гасится и не кликается. */
+	sitemap?: boolean;
+	/** Текущий путь — чтобы пометить ссылку на открытую страницу. */
+	pathname?: string;
+}
+
+const { title, links, sitemap = false, pathname } = Astro.props;
+
+const isCurrent = (url: string) => pathname === url || pathname === `${url}/`;
+const isExternal = (url: string) => /^https?:\/\//.test(url);
+---
+
+<div class="c-footer-content__col">
+  {title && <p class="c-footer-content__heading">{title}</p>}
+
+  <ul class="c-footer-content__list">
+    {
+      links.map((link) => (
+        <li>
+          <a
+            href={link.url}
+            class:list={[
+              "c-footer-content__link",
+              {
+                "c-footer-content__link--sitemap": sitemap,
+                "is-current": sitemap && isCurrent(link.url),
+              },
+            ]}
+            aria-current={sitemap && isCurrent(link.url) ? "page" : undefined}
+            {...(isExternal(link.url) && { target: "_blank", rel: "noopener noreferrer" })}
+          >
+            <DecodeText as="span" duration={1}>
+              {link.label}
+            </DecodeText>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>

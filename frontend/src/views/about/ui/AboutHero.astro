@@ -1,0 +1,12 @@
+---
+interface Props {
+	/** Каждая строка — отдельный блок, как их разбил редактор. */
+	lines: string[];
+}
+
+const { lines } = Astro.props;
+---
+
+<h1 class="c-about__mark">
+  {lines.map((line) => <span class="c-about__mark-line">{line}</span>)}
+</h1>

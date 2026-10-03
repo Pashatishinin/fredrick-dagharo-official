@@ -1,0 +1,23 @@
+---
+import type { ProjectPage } from "../../entities";
+import ProjectHero from "./ui/ProjectHero.astro";
+import ProjectInfo from "./ui/ProjectInfo.astro";
+import ProjectNav from "./ui/ProjectNav.astro";
+
+/** Страница проекта целиком: hero с плеером, описание и факты, соседи. */
+interface Props {
+	page: ProjectPage;
+}
+
+const { project, previous, next } = Astro.props.page;
+---
+
+<ProjectHero film={project} />
+<ProjectInfo film={project} />
+<ProjectNav previous={previous} next={next} />
+
+<script>
+  import { initProjectHero } from "./lib/hero";
+
+  document.addEventListener("astro:page-load", initProjectHero);
+</script>

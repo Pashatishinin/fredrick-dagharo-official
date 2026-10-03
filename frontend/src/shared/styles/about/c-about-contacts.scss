@@ -1,0 +1,101 @@
+@use "../abstracts" as *;
+
+/* ---- Контакты: финал страницы, набран как клиенты ---- */
+
+.c-about__row--contacts {
+  margin-top: var(--about-space-md);
+}
+
+.c-about__contacts {
+  list-style: none;
+  display: grid;
+  row-gap: 1.25rem;
+  padding: 0;
+
+  /* На телефоне лейбл ряда и подпись первого контакта стоят друг под
+     другом — без отступа два мелких лейбла слипаются в один. */
+  @include to(sm) {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Подпись — сверху мелким лейблом, значение — под ней крупно.
+   На мобильном так не приходится ужимать e-mail в узкую колонку. */
+.c-about__contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0.35rem;
+}
+
+.c-about__contact-kind {
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.c-about__contact-link {
+  justify-self: start;
+  max-width: 100%;
+  font-family: $font-serif;
+  font-size: clamp(1.375rem, 2.4vw, 2.125rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: inherit;
+  /* Длинный адрес не должен распирать страницу на узком экране */
+  overflow-wrap: anywhere;
+  /* Никакого подчёркивания: на наведение отвечает только декодер */
+  text-decoration: none;
+}
+
+/* Декодер на ссылке. Базовый .c-decode свёрстан под пункты меню —
+   капсом, гротеском, во всю ширину. Здесь значение остаётся набранным
+   как клиенты: засечки, исходный регистр (e-mail капсом не читается).
+   Вложено в ссылку ради специфичности: c-decode-text.scss подключается
+   позже и при равном весе перебил бы эти правила. */
+.c-about__contact-link .c-about__contact-decode {
+  display: inline;
+  width: auto;
+  color: inherit;
+  line-height: inherit;
+
+  /* Под курсором тускнеет так же, как ссылки в шапке и футере */
+  &:hover {
+    color: $color-text-hover;
+  }
+
+  .c-decode__text {
+    display: inline;
+    font-family: inherit;
+    text-transform: none;
+  }
+}
+
+/* Клавиатурный фокус оставляем: без него ссылку не видно при Tab */
+.c-about__contact-link:focus-visible {
+  outline: 1px solid $color-frame;
+  outline-offset: 0.2em;
+}
+
+/* Контакты стоят в той же колонке, что и клиенты над ними */
+@include from(sm) {
+  .c-about__row--contacts .c-about__body {
+    grid-column: 5 / -1;
+  }
+
+  /* Подпись слева от значения, в общую колонку по базовой линии */
+  .c-about__contacts {
+    row-gap: 1.1rem;
+  }
+
+  .c-about__contact {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    column-gap: var(--about-gap);
+    align-items: baseline;
+  }
+
+  .c-about__contact-kind {
+    font-size: 12px;
+  }
+}

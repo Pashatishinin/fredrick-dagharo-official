@@ -13,8 +13,6 @@ export const initParallax = (element: HTMLElement, yPercentValue: number = 20) =
 		if (t.trigger === container) t.kill();
 	});
 
-	console.log("Success: Plugin registered and trigger created!");
-
 	return gsap.fromTo(
 		element,
 		{ yPercent: -yPercentValue },

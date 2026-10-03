@@ -1,0 +1,29 @@
+@use "../abstracts" as *;
+
+.c-about__services {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: var(--about-gap);
+  row-gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+}
+
+.c-about__service {
+  display: grid;
+  grid-template-columns: 2.2em 1fr;
+}
+
+.c-about__service-num {
+  opacity: 0.55;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Две колонки заполняются по строкам: слева 01 / 03 / 05, справа 02 / 04 / 06 */
+@include from(sm) {
+  .c-about__services {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 1.1rem;
+  }
+}

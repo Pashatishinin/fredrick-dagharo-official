@@ -1,0 +1,30 @@
+@use "../abstracts" as *;
+
+.c-decode {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: $color-text;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $color-text-hover;
+  }
+}
+
+.c-decode__text {
+  display: inline-block;
+  font-family: $font-sans;
+  text-transform: uppercase;
+  // Анимация перебирает символы: без этих трёх строк строка дёргается
+  // по ширине на каждом кадре.
+  font-kerning: none;
+  text-rendering: optimizeSpeed;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,26 @@
+---
+import type { Photo } from "../../entities";
+import PhotoGallery from "./ui/PhotoGallery.astro";
+import PhotoNav from "./ui/PhotoNav.astro";
+import PhotoPreviews from "./ui/PhotoPreviews.astro";
+
+/** Галерея снимков: сетка или слайдер (см. lib/gallery.ts). */
+interface Props {
+	photos: Photo[];
+}
+
+const { photos } = Astro.props;
+---
+
+<section class="c-photo">
+  <PhotoNav />
+  <PhotoGallery photos={photos} />
+  <div class="c-photo__frame" aria-hidden="true"></div>
+  <PhotoPreviews photos={photos} />
+</section>
+
+<script>
+  import { initPhotography } from "./lib/gallery";
+
+  document.addEventListener("astro:page-load", initPhotography);
+</script>

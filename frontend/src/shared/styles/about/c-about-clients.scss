@@ -1,0 +1,19 @@
+@use "../abstracts" as *;
+
+.c-about__row--clients {
+  margin-top: var(--about-space-sm);
+}
+
+.c-about__clients {
+  font-family: $font-serif;
+  font-size: clamp(1.375rem, 2.4vw, 2.125rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+/* В макете клиенты начинаются на колонку левее остального текста */
+@include from(sm) {
+  .c-about__row--clients .c-about__body {
+    grid-column: 5 / -1;
+  }
+}

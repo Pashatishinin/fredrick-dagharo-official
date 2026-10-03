@@ -8,7 +8,7 @@ export default defineConfig({
 	name: "default",
 	title: "fredrick-dagharo",
 
-	projectId: "d10veeij",
+	projectId: "a36murzz",
 	dataset: "production",
 
 	plugins: [structureTool({ structure }), visionTool()],

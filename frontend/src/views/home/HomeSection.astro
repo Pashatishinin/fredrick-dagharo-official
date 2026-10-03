@@ -1,0 +1,26 @@
+---
+import Card from "../../components/common/Card/Card.astro";
+import type { Film } from "../../entities";
+import { formatIndex } from "../../shared/utils/format";
+
+/** Галерея избранных фильмов. Порядок и отбор задаёт запрос. */
+interface Props {
+	films: Film[];
+}
+
+const { films } = Astro.props;
+---
+
+<section class="c-works">
+  <div class="c-works__grid">
+    {
+      films.map((film, index) => (
+        <div class:list={[{ "c-works__item--big": film.isBig }]}>
+          <a href={`/projects/${film.slug}`}>
+            <Card film={film} number={formatIndex(index)} />
+          </a>
+        </div>
+      ))
+    }
+  </div>
+</section>

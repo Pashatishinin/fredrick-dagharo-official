@@ -1,0 +1,24 @@
+@use "../abstracts" as *;
+
+// Заставка видна только пока на <html> висит is-loading (см. Loader.astro):
+// без этого класса — повторный заход, переход по сайту, выключенный JS —
+// её нет, и она не может закрыть страницу.
+.c-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background-color: #010101;
+
+  .is-loading & {
+    display: flex;
+  }
+}
+
+.c-loader__media {
+  height: 100%;
+  width: auto;
+  object-fit: cover;
+}

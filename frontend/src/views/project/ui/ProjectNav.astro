@@ -1,0 +1,26 @@
+---
+import Card from "../../../components/common/Card/Card.astro";
+import type { Film } from "../../../entities";
+
+/** Соседние проекты по кругу. «Предыдущий» виден только там, где хватает ширины. */
+interface Props {
+	previous: Film;
+	next: Film;
+}
+
+const { previous, next } = Astro.props;
+---
+
+<section class="c-project-next">
+  <div class="c-project-next__item c-project-next__item--prev">
+    <a href={`/projects/${previous.slug}`} class="c-project-next__link">
+      <Card subTitle="Previous Project" film={previous} fill right />
+    </a>
+  </div>
+
+  <div class="c-project-next__item">
+    <a href={`/projects/${next.slug}`} class="c-project-next__link">
+      <Card subTitle="Next Project" film={next} fill />
+    </a>
+  </div>
+</section>

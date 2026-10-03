@@ -1,0 +1,40 @@
+---
+import type { AboutShowreel } from "../../../entities";
+import { getVimeoThumbnail, vimeoBackgroundSrc } from "../../../shared/utils/vimeo.utils";
+
+interface Props {
+	showreel: AboutShowreel;
+}
+
+const { showreel } = Astro.props;
+
+// Кадр с i.vimeocdn забираем на сборке: он показывается мгновенно
+// и держит место, пока поднимается плеер.
+const poster = await getVimeoThumbnail(showreel.vimeoId);
+---
+
+<div class="c-about__showreel" data-showreel>
+  <div class="c-about__showreel-media">
+    <img
+      class="c-about__showreel-poster"
+      src={poster}
+      alt=""
+      aria-hidden="true"
+      loading="lazy"
+      decoding="async"
+    />
+    <!-- src подставит mount-on-approach из data-src, когда блок подойдёт к экрану -->
+    <iframe
+      data-src={vimeoBackgroundSrc(showreel.vimeoId)}
+      title={showreel.title}
+      class="c-about__showreel-frame"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen></iframe>
+  </div>
+</div>
+
+<script>
+  import { initShowreel } from "../lib/showreel";
+
+  document.addEventListener("astro:page-load", initShowreel);
+</script>

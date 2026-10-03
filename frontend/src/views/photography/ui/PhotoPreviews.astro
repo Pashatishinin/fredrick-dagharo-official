@@ -1,0 +1,26 @@
+---
+import type { Photo } from "../../../entities";
+
+/** Крупные кадры для раскладки SLIDER — ленивые, в сетке они не видны. */
+interface Props {
+	photos: Photo[];
+}
+
+const { photos } = Astro.props;
+---
+
+<div class="c-photo__previews" aria-hidden="true">
+  {
+    photos.map((photo) => (
+      <img
+        src={photo.src}
+        alt=""
+        width={photo.width}
+        height={photo.height}
+        style={`--ratio:${photo.width}/${photo.height}`}
+        loading="lazy"
+        decoding="async"
+      />
+    ))
+  }
+</div>

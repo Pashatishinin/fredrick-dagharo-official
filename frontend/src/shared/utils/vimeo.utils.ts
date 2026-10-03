@@ -1,6 +1,6 @@
 interface VimeoOEmbed {
 	thumbnail_url: string;
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 export const getVimeoThumbnail = async (
@@ -29,3 +29,11 @@ export const getVimeoThumbnail = async (
 		return fallback;
 	}
 };
+
+/**
+ * Адрес фонового плеера: без интерфейса, без звука, по кругу.
+ * dnt=1 — плеер не грузит свою аналитику, это заметный кусок его скриптов.
+ * Один источник для всех декоративных видео сайта (шоурил, фон футера).
+ */
+export const vimeoBackgroundSrc = (vimeoId: string) =>
+	`https://player.vimeo.com/video/${vimeoId}?autoplay=1&muted=1&background=1&loop=1&autopause=0&playsinline=1&dnt=1`;

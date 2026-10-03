@@ -1,8 +1,16 @@
 ---
+import { fetchArchiveData } from "../../entities";
 import MainLayout from "../../layouts/MainLayout.astro";
-import ListSection from "../../views/index/list-section/ListSection.astro";
+import { PAGE_TITLES } from "../../shared/config/titles";
+import ArchiveSection from "../../views/archive/ArchiveSection.astro";
+
+const { seo, films } = await fetchArchiveData();
+
+if (!films.length) {
+	console.warn("[archive] В Sanity нет опубликованных фильмов со слагом");
+}
 ---
 
-<MainLayout title="Archive">
-  <ListSection />
+<MainLayout title={seo.title || PAGE_TITLES.archive} description={seo.description || undefined}>
+  <ArchiveSection films={films} />
 </MainLayout>

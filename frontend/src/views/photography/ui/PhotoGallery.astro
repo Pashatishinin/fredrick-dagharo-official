@@ -1,0 +1,36 @@
+---
+import type { Photo } from "../../../entities";
+
+interface Props {
+	photos: Photo[];
+}
+
+const { photos } = Astro.props;
+
+// lqip — крошечный base64 из метаданных ассета: пока грузится миниатюра,
+// карточка показывает размытый кадр, а не серый блок.
+const cardStyle = (photo: Photo) =>
+	[`--ratio:${photo.width}/${photo.height}`, photo.lqip && `background-image:url(${photo.lqip})`]
+		.filter(Boolean)
+		.join(";");
+---
+
+<!-- Из данных нужна только пропорция снимка: расстановку держит CSS-сетка.
+     Миниатюры (~16 КБ) грузятся сразу — это содержимое первого экрана. -->
+<div class="c-photo__container">
+  <div class="c-photo__gallery layout-grid">
+    {
+      photos.map((photo) => (
+        <div class="c-photo__card" style={cardStyle(photo)}>
+          <img
+            src={photo.thumb}
+            alt={photo.alt}
+            width={photo.width}
+            height={photo.height}
+            decoding="async"
+          />
+        </div>
+      ))
+    }
+  </div>
+</div>

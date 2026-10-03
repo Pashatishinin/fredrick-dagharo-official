@@ -1,0 +1,4 @@
+// Общая точка входа для всех частичных файлов:
+//   @use "../abstracts" as *;
+@forward "tokens";
+@forward "mixins";

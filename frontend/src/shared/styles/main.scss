@@ -1,0 +1,41 @@
+// Единственная точка входа для стилей проекта.
+// Подключается в MainLayout; всё остальное — отсюда.
+//
+// Порядок важен: сначала сброс и типографика, затем раскладка страницы,
+// затем компоненты и секции. Скоупа больше нет — его роль выполняют
+// уникальные классы c-*, поэтому голых селекторов вроде `img` или `nav`
+// в файлах секций быть не должно.
+
+@use "base/reset";
+@use "base/typography";
+
+@use "layout/l-page";
+
+@use "header/c-header";
+
+@use "footer/c-footer";
+@use "footer/c-footer-content";
+@use "footer/c-footer-video";
+
+@use "home/c-works";
+@use "archive/c-archive";
+@use "about/c-about";
+@use "about/c-about-hero";
+@use "about/c-about-portrait";
+@use "about/c-about-services";
+@use "about/c-about-showreel";
+@use "about/c-about-clients";
+@use "about/c-about-contacts";
+@use "photography/c-photo";
+
+@use "project/c-project-hero";
+@use "project/c-project-info";
+@use "project/c-project-next";
+
+@use "components/c-card";
+@use "components/c-clock";
+@use "components/c-cursor";
+@use "components/c-decode-text";
+@use "components/c-loader";
+@use "components/c-scroll-top";
+@use "components/c-text-effect";

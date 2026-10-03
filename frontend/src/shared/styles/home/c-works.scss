@@ -1,0 +1,37 @@
+@use "../abstracts" as *;
+
+/* Галерея избранных фильмов на главной. */
+
+.c-works {
+  width: 100%;
+  padding-inline: $gutter;
+  padding-block: 7.5rem;
+}
+
+.c-works__grid {
+  display: grid;
+  // dense — чтобы крупные карточки не оставляли дыр в потоке.
+  grid-auto-flow: dense;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding-block: 1rem;
+
+  @include from(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include from(md) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @include from(lg) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.c-works__item--big {
+  @include from(sm) {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}

@@ -1,4 +1,4 @@
-<div class="flex flex-col items-end uppercase ">
+<div class="c-clock">
   <span id="current-time">00:00:00</span>
   <span id="current-location">Loading location...</span>
 </div>
@@ -8,43 +8,38 @@
 
   function updateTime() {
     const timeElement = document.getElementById("current-time");
-    if (timeElement) {
-      timeElement.innerText = new Date().toLocaleTimeString("en-GB", {
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      });
-    }
+    if (!timeElement) return;
+
+    timeElement.innerText = new Date().toLocaleTimeString("en-GB", {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   }
 
-  function getLocation() {
+  function showLocation() {
     const locElement = document.getElementById("current-location");
     if (!locElement) return;
 
     try {
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const offset = -new Date().getTimezoneOffset() / 60;
-      const gmtDisplay = `GMT${offset >= 0 ? "+" : ""}${offset}`;
-      locElement.innerText = `${timeZone} (${gmtDisplay})`;
-    } catch (e) {
+      locElement.innerText = `${timeZone} (GMT${offset >= 0 ? "+" : ""}${offset})`;
+    } catch {
       locElement.innerText = "Location unavailable";
     }
   }
 
   function initClock() {
-    if (timerId) {
-      clearInterval(timerId);
-    }
+    if (timerId) clearInterval(timerId);
 
     updateTime();
-    getLocation();
-
+    showLocation();
     timerId = window.setInterval(updateTime, 1000);
   }
 
   document.addEventListener("astro:page-load", initClock);
-
   document.addEventListener("astro:before-preparation", () => {
     if (timerId) clearInterval(timerId);
   });

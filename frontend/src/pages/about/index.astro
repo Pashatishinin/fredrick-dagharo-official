@@ -1,0 +1,17 @@
+---
+import { fetchAboutData, fetchContactsData } from "../../entities";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { PAGE_TITLES } from "../../shared/config/titles";
+import AboutSection from "../../views/about/AboutSection.astro";
+
+const [about, contacts] = await Promise.all([fetchAboutData(), fetchContactsData()]);
+
+// Пустой заголовок в студии → заглушка из shared/config/titles.ts;
+// пустое описание → MainLayout возьмёт описание сайта.
+const title = about.seo.title || PAGE_TITLES.about;
+const description = about.seo.description || undefined;
+---
+
+<MainLayout title={title} description={description}>
+  <AboutSection about={about} contacts={contacts} />
+</MainLayout>

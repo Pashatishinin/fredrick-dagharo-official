@@ -1,0 +1,19 @@
+---
+/** Переключатель раскладок. id кнопки = класс раскладки на галерее. */
+const LAYOUTS = [
+	{ id: "layout-grid", label: "GRID" },
+	{ id: "layout-slider", label: "SLIDER" },
+];
+---
+
+<nav class="c-photo__nav" aria-label="Gallery layout">
+  {
+    LAYOUTS.map((layout) => (
+      <div class="c-photo__nav-item">
+        <button type="button" class="c-photo__nav-link" id={layout.id} aria-pressed="false">
+          {layout.label}
+        </button>
+      </div>
+    ))
+  }
+</nav>

@@ -1,0 +1,223 @@
+@use "../abstracts" as *;
+
+/* /photography: сетка снимков и слайдер (раскладки переключает
+   views/photography/lib/gallery.ts). */
+
+/* Подложка чуть светлее фона страницы: пока снимок не доехал, бокс
+   виден как заглушка. На чёрном по чёрному он читался как дыра в
+   сетке — казалось, что фотографий просто нет. */
+.c-photo__card {
+  overflow: hidden;
+  /* Подложка на случай, если у снимка нет lqip: заглушка из токенов. */
+  background-color: $color-placeholder;
+  background-position: center;
+  background-size: cover;
+}
+
+.c-photo__card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Вертикально у правого края: горизонтальная полоса на top:0
+   налезала на шапку сайта. По центру по высоте не пересекается
+   ни с шапкой, ни с кнопкой [ TOP ] внизу слева. */
+.c-photo__nav {
+  position: fixed;
+  top: 50%;
+  right: 2em;
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+  z-index: 2;
+}
+
+// Кнопка ведёт себя как блок — так же, как стоявший здесь раньше <p>.
+.c-photo__nav-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: $color-text;
+  opacity: 0.4;
+  transition: opacity 0.3s ease-out;
+}
+
+.c-photo__nav-link:hover,
+.c-photo__nav-link:focus-visible,
+.c-photo__nav-link.active {
+  opacity: 1;
+}
+
+.c-photo {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  // Отбивка от футера: в разметке это был mb-24.
+  margin-bottom: 6rem;
+}
+
+/* Колонка превью была position:absolute, а у секции не было position —
+   значит она цеплялась к <body> и в высоту секции не входила вовсе.
+   Секция оставалась ровно в экран, а всё, что ниже первого экрана,
+   занимал футер: в MainLayout он подтянут на -100vh и лежит с z-30,
+   то есть перекрывал галерею собой. Поэтому колонка теперь в потоке —
+   именно она и задаёт высоту секции. */
+.c-photo__previews {
+  display: none;
+  width: min(600px, 80vw);
+  margin: 0 auto;
+  padding-top: 25vh;
+  opacity: 0;
+}
+
+/* content-box обязателен: иначе aspect-ratio считался бы вместе с
+   вертикальным padding и кадр сплющивало бы. */
+.c-photo__previews img {
+  box-sizing: content-box;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--ratio);
+  padding: 1em 0;
+}
+
+/* Источник правды один — класс на галерее. Превью нужны только во
+   втором макете, и именно display:none: visibility оставила бы
+   8400px пустоты под разбросанным макетом. */
+.c-photo:has(.c-photo__gallery.layout-slider) .c-photo__previews {
+  display: block;
+}
+
+/* Во втором макете галерея зафиксирована, поэтому её контейнер не
+   должен занимать экран — иначе колонка превью начиналась бы
+   экраном ниже и первый разворот прокрутки был бы пустым. */
+.c-photo:has(.c-photo__gallery.layout-slider) .c-photo__container {
+  height: 0;
+  padding: 0;
+}
+
+/* Высоту не задаём: её определяет сама сетка. Секция при этом не короче
+   экрана — за это отвечает min-height. Боковые поля как на остальных
+   страницах сайта: без них первая колонка упиралась в край экрана. */
+.c-photo__container {
+  width: 100%;
+  padding: 4em $gutter 0;
+}
+
+@include from(sm) {
+  .c-photo__container {
+    padding-inline: $gutter-lg;
+  }
+}
+
+/* Чёткая сетка вместо разброса. auto-fill сам решает, сколько колонок
+   влезло, — поэтому и 15, и 40+ снимков ложатся без единой строчки
+   расчётов в JS. Полоса справа — под навигацию: она fixed, и без
+   вычета ширины карточки заезжали бы под неё (отступ контейнера
+   тут не помогает — навигация вне потока).
+   align-items: start — чтобы разноформатные снимки выравнивались по
+   верху строки, а не растягивались до высоты самого высокого. */
+.c-photo__gallery.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(clamp(90px, 11vw, 150px), 1fr)
+  );
+  gap: clamp(1rem, 2vw, 2.5rem);
+  align-items: start;
+  width: calc(100% - 4em);
+}
+
+.c-photo__gallery.layout-grid .c-photo__card {
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--ratio);
+}
+
+.c-photo__gallery.layout-slider {
+  padding-top: 0.5em;
+  position: fixed;
+  top: 25%;
+  left: 10%;
+  transform: translateX(0%);
+}
+
+/* Ширина фиксирована, высота — из пропорций снимка: колонка переживёт
+   разноформатные фотографии. Рамка и синхронизация с превью считаются
+   по фактическим offsetTop, а не по единому шагу, ровно поэтому. */
+.c-photo__gallery.layout-slider .c-photo__card {
+  width: 75px;
+  height: auto;
+  aspect-ratio: var(--ratio);
+  margin-bottom: 1em;
+}
+
+/* Рамка неподвижна и стоит в центре экрана — сквозь неё проходит вся
+   колонка. Раньше двигались обе, и их приходилось согласовывать.
+   Центрируем через translate: GSAP теперь трогает у рамки только
+   height и прозрачность, transform не пишет — значит не затрёт.
+   Размер — ровно карточка плюс 5px воздуха, высоту подставляет JS
+   под текущий снимок. */
+.c-photo__frame {
+  position: fixed;
+  top: 50%;
+  left: 10%;
+  margin-left: -5px;
+  translate: 0 -50%;
+  width: 85px;
+  height: 110px;
+  border: 1px solid $color-frame;
+  border-radius: 2px;
+  z-index: 2;
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* ============================================================
+   МОБИЛЬНАЯ ВЕРСИЯ
+
+   Ни сетки, ни слайдера: снимки идут одной колонкой во всю ширину,
+   прокрутка нативная. Переключатель убран — переключать нечего,
+   а миникарта рассчитана на высокий экран и на телефоне только
+   мешала бы. JS секцию на этой ширине даже не инициализирует.
+
+   Правила продублированы для обоих классов макета намеренно: если
+   посетитель сузит окно, уже стоящий на галерее layout-slider
+   не должен утащить её в fixed-позицию.
+   ============================================================ */
+
+@include to(md) {
+  .c-photo__nav,
+  .c-photo__previews,
+  .c-photo__frame {
+    display: none;
+  }
+
+  .c-photo__gallery.layout-grid,
+  .c-photo__gallery.layout-slider {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    padding-top: 0;
+    transform: none;
+  }
+
+  .c-photo__gallery.layout-grid .c-photo__card,
+  .c-photo__gallery.layout-slider .c-photo__card {
+    width: 100%;
+    height: auto;
+    margin-bottom: 0;
+    aspect-ratio: var(--ratio);
+  }
+
+  /* Обнуление высоты контейнера нужно только слайдеру на десктопе. */
+  .c-photo:has(.c-photo__gallery.layout-slider) .c-photo__container {
+    height: auto;
+    padding: 4em $gutter 0;
+  }
+}

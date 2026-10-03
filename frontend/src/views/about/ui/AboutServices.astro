@@ -1,0 +1,27 @@
+---
+import { formatIndex } from "../../../shared/utils/format";
+import AboutRow from "./AboutRow.astro";
+
+interface Props {
+	services: string[];
+}
+
+const { services } = Astro.props;
+---
+
+<AboutRow label="SERVICE" stagger={0.04}>
+  <ol class="c-about__body c-about__services">
+    {
+      services.map((service, index) => (
+        <li class="c-about__service">
+          <span class="c-about__service-num" data-split-target>
+            {formatIndex(index)}
+          </span>
+          <span class="c-about__service-name" data-split-target>
+            {service}
+          </span>
+        </li>
+      ))
+    }
+  </ol>
+</AboutRow>

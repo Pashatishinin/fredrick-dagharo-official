@@ -1,0 +1,25 @@
+@use "../abstracts" as *;
+
+// Засечная — голос логотипа. Секции, которым нужна другая метрика,
+// перебивают её у себя (например заголовок About).
+h1,
+h5 {
+  font-family: $font-serif;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: -0.1em;
+  line-height: 80%;
+}
+
+.u-label {
+  @include label;
+}
+
+.u-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

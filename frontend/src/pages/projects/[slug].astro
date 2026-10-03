@@ -1,35 +1,30 @@
 ---
-import Layout from "../../layouts/Layout.astro";
+import { fetchProjectPages } from "../../entities";
 import MainLayout from "../../layouts/MainLayout.astro";
-import { filmData } from "../../shared/data/films.data";
-import GallerySection from "../../views/project/GallerySection/GallerySection.astro";
-import HeroSection from "../../views/project/HeroSection/HeroSection.astro";
-import InfoSection from "../../views/project/InfoSection/InfoSection.astro";
-import NextSection from "../../views/project/NextSection/NextSection.astro";
+import { excerpt } from "../../shared/utils/format";
+import ProjectSection from "../../views/project/ProjectSection.astro";
 
+/**
+ * Страницы проектов собираются из опубликованных фильмов со слагом.
+ * Соседей (предыдущий / следующий) считает fetchProjectPages.
+ */
 export async function getStaticPaths() {
-	const data = filmData;
+	const pages = await fetchProjectPages();
 
-	return data.map((project, index) => {
-		const prevIndex = (index - 1 + data.length) % data.length;
-		const nextIndex = (index + 1) % data.length;
-		return {
-			params: { slug: project.slug },
-			props: {
-				project,
-				previousProject: data[prevIndex],
-				nextProject: data[nextIndex],
-			},
-		};
-	});
+	return pages.map((page) => ({
+		params: { slug: page.project.slug as string },
+		props: { page },
+	}));
 }
 
-const { project, previousProject, nextProject } = Astro.props;
+const { page } = Astro.props;
+const { project } = page;
+
+// SEO фильма в студии необязательно: пустые поля берём из названия и описания.
+const title = project.seo.title || project.title;
+const description = project.seo.description || excerpt(project.info) || undefined;
 ---
 
-<MainLayout title={project.title}>
-  <HeroSection data={project} />
-  <InfoSection data={project} />
-  <!-- <GallerySection /> -->
-  <NextSection previous={previousProject} next={nextProject} />
+<MainLayout title={title} description={description}>
+  <ProjectSection page={page} />
 </MainLayout>

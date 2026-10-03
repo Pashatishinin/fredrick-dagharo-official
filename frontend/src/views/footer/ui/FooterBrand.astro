@@ -1,0 +1,32 @@
+---
+import Logo from "../../../components/common/Logo.astro";
+import type { Image } from "../../../entities";
+
+interface Props {
+	/** Строки текстового логотипа из Site Settings. */
+	lines: string[];
+	/** Картинка-логотип; если не загружена — показываем текст. */
+	image: Image;
+}
+
+const { lines, image } = Astro.props;
+---
+
+<div class="c-footer-content__brand">
+  <a href="/" id="logo-link-footer" aria-label={lines.join(" ")}>
+    <Logo
+      lines={lines}
+      image={image}
+      lineClass="c-footer-content__brand-line"
+      imageClass="c-footer-content__brand-image"
+    />
+  </a>
+</div>
+
+<script>
+  import { initLogoScroll } from "../../../shared/lib/logo-scroll";
+
+  document.addEventListener("astro:page-load", () =>
+    initLogoScroll(document.querySelector<HTMLAnchorElement>("#logo-link-footer")),
+  );
+</script>

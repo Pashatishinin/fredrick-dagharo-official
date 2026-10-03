@@ -1,0 +1,26 @@
+---
+import TextEffect from "../../../components/animations/TextEffect.astro";
+
+/**
+ * Ряд страницы: служебный лейбл слева, содержимое справа.
+ * Появляется по скроллу — анимируются все [data-split-target] внутри.
+ */
+interface Props {
+	/** Текст лейбла без скобок: скобки — часть оформления. */
+	label: string;
+	/** Модификатор c-about__row--<modifier> для особой раскладки ряда. */
+	modifier?: string;
+	stagger?: number;
+}
+
+const { label, modifier, stagger } = Astro.props;
+
+const className = ["c-about__grid", "c-about__row", modifier && `c-about__row--${modifier}`]
+	.filter(Boolean)
+	.join(" ");
+---
+
+<TextEffect className={className} stagger={stagger}>
+  <p class="c-about__label" data-split-target>[ {label} ]</p>
+  <slot />
+</TextEffect>

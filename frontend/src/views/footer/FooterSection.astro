@@ -1,15 +1,44 @@
 ---
-import DecodeText from "../../components/animations/DecodeText.astro";
-import FooterContent from "./ui/FooterContent.astro";
+import { fetchSiteSettings } from "../../entities";
+import { NAVIGATION } from "../../shared/config/navigation";
+import { SITEMAP_TITLE, SOCIAL_TITLE } from "./footer.config";
+import FooterBrand from "./ui/FooterBrand.astro";
+import FooterLinks from "./ui/FooterLinks.astro";
+import FooterVideo from "./ui/FooterVideo.astro";
+
+/**
+ * Футер выезжает из-под контента (см. c-footer.scss). Логотип, соцсети
+ * и фон берутся из Site Settings, заголовки колонок и карта сайта —
+ * из footer.config.ts и общей навигации. Незаполненный в студии блок не выводится.
+ */
+const { logo, logoImage, footer } = await fetchSiteSettings();
+const { pathname } = new URL(Astro.request.url);
 ---
 
-<footer
-  class="relative h-[800px] z-30"
-  style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
->
-  <div class="relative h-[calc(100vh+800px)] -top-[100vh]">
-    <div class="sticky top-[calc(100vh-800px)] h-[800px]">
-      <FooterContent />
+<footer class="c-footer">
+  <div class="c-footer__track">
+    <div class="c-footer__sticky">
+      <section class="c-footer-content">
+        {
+          footer.backgroundVimeoId && (
+            <div class="c-footer-content__media">
+              <FooterVideo vimeoId={footer.backgroundVimeoId} />
+            </div>
+          )
+        }
+
+        <div class="c-footer-content__grid">
+          {logo.length > 0 && <FooterBrand lines={logo} image={logoImage} />}
+
+          {
+            footer.social.length > 0 && (
+              <FooterLinks title={SOCIAL_TITLE} links={footer.social} />
+            )
+          }
+
+          <FooterLinks title={SITEMAP_TITLE} links={NAVIGATION} sitemap pathname={pathname} />
+        </div>
+      </section>
     </div>
   </div>
 </footer>

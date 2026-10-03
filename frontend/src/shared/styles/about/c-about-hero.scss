@@ -1,0 +1,17 @@
+@use "../abstracts" as *;
+
+/* Заголовок первого экрана. Засечная — та же, что в логотипе.
+   Глобальное правило для h1 задаёт -0.1em и line-height 80% — перебиваем. */
+.c-about__mark {
+  font-family: $font-serif;
+  font-weight: 400;
+  font-size: clamp(2.125rem, 6vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.c-about__mark-line {
+  display: block;
+}

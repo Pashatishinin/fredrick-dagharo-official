@@ -1,0 +1,61 @@
+---
+import type { Image } from "../../../entities";
+
+interface Props {
+	image: Image;
+	/** Второй кадр, проявляется плитками под курсором. Без него эффекта нет. */
+	hoverSrc: string | null;
+}
+
+const { image, hoverSrc } = Astro.props;
+
+// Сетка плиток поверх портрета. Контейнер 3:2, поэтому 12x8 даёт
+// строго квадратные ячейки на любой ширине.
+const COLS = 12;
+const ROWS = 8;
+const blocks = Array.from({ length: COLS * ROWS }, (_, i) => ({
+	col: i % COLS,
+	row: Math.floor(i / COLS),
+}));
+---
+
+<div class="c-about__grid c-about__media">
+  <figure class="c-about__figure">
+    <img
+      src={image.url}
+      alt={image.alt}
+      width={image.width}
+      height={image.height}
+      loading="eager"
+      decoding="async"
+    />
+
+    {
+      hoverSrc && (
+        <div
+          class="c-about__reveal"
+          data-reveal
+          aria-hidden="true"
+          style={`--reveal-cols:${COLS};--reveal-rows:${ROWS};--reveal-src:url(${hoverSrc})`}
+        >
+          {blocks.map((block) => (
+            <span class="c-about__reveal-block" style={`--col:${block.col};--row:${block.row}`} />
+          ))}
+        </div>
+      )
+    }
+  </figure>
+</div>
+
+<script>
+  import { initHoverTrail } from "../../../shared/lib/hover-trail";
+
+  // Под курсором плитка открывается мгновенно и гаснет медленно —
+  // та же механика, что у фона в футере.
+  document.addEventListener("astro:page-load", () =>
+    initHoverTrail(
+      document.querySelector<HTMLElement>("[data-reveal]"),
+      ".c-about__reveal-block",
+    ),
+  );
+</script>

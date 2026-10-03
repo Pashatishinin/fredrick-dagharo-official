@@ -1,0 +1,32 @@
+---
+import type { Film } from "../../entities";
+import ArchiveItem from "./ui/ArchiveItem.astro";
+
+/** Список всех фильмов. Порядок задаёт запрос: новые сверху. */
+interface Props {
+	films: Film[];
+}
+
+const { films } = Astro.props;
+---
+
+<section class="c-archive">
+  <div class="c-archive__list">
+    {films.map((film, index) => <ArchiveItem film={film} index={index} />)}
+  </div>
+</section>
+
+<script>
+  // Превью — position: fixed по центру экрана, поэтому для браузера каждое
+  // из них «в кадре», и loading="lazy" не спасает: гифки всех фильмов
+  // качались бы при открытии страницы. Грузим гифку только при первом
+  // наведении на строку. Слушатель один на документ и вешается один раз.
+  document.addEventListener("mouseover", (event) => {
+    const item = (event.target as Element | null)?.closest("[data-archive-item]");
+    const img = item?.querySelector<HTMLImageElement>("img[data-src]");
+    if (!img?.dataset.src) return;
+
+    img.src = img.dataset.src;
+    img.removeAttribute("data-src");
+  });
+</script>

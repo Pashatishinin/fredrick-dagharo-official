@@ -1,0 +1,109 @@
+@use "../abstracts" as *;
+
+/* Карточка фильма — общий компонент: галерея главной и блок
+   «предыдущий / следующий» на странице проекта. */
+
+.c-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  overflow: clip;
+}
+
+.c-card__meta {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  margin-top: 1rem;
+
+  &.is-right {
+    justify-content: flex-end;
+    text-align: right;
+  }
+}
+
+.c-card__index,
+.c-card__subtitle,
+.c-card__title {
+  font-size: 10px;
+}
+
+.c-card__subtitle {
+  opacity: 0.6;
+}
+
+.c-card__title {
+  max-width: 12.5rem;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  // Крупная карточка — только когда в сетке больше одной колонки:
+  // на телефоне все карточки одного размера (см. c-works__item--big).
+  .c-card--big & {
+    @include from(sm) {
+      max-width: 25rem;
+    }
+  }
+}
+
+.c-card__media {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  min-height: 12.5rem;
+
+  .c-card--big & {
+    @include from(sm) {
+      aspect-ratio: auto;
+      min-height: 28.875rem;
+    }
+  }
+
+  .c-card--fill & {
+    aspect-ratio: auto;
+    flex-grow: 1;
+    min-height: 0;
+  }
+}
+
+.c-card__gif {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// До инициализации скрыты: так не видно рывка, когда GSAP
+// впервые выставляет сдвиг параллакса (класс ставит Card.astro).
+.c-card__cover,
+.c-card__gif {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+
+  &.initialised {
+    opacity: 1;
+  }
+}
+
+// Обложка выше контейнера: запас нужен параллаксу, иначе снизу
+// показалась бы пустота.
+.c-card__cover {
+  position: absolute;
+  bottom: -10%;
+  left: 0;
+  width: 100%;
+  height: 120%;
+  object-fit: cover;
+
+  // При наведении уступает место гифке
+  .c-card:hover &.has-gif {
+    opacity: 0;
+  }
+}

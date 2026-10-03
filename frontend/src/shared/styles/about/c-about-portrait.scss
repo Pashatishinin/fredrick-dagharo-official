@@ -1,0 +1,84 @@
+@use "../abstracts" as *;
+
+.c-about__media {
+  margin-top: var(--about-space-hero);
+}
+
+.c-about__figure {
+  /* Кадрирование держим в одной переменной: основной снимок и плитки
+     второго кадра обязаны совпадать, иначе на наведении будет рывок. */
+  --portrait-focus: center 18%;
+
+  position: relative;
+  grid-column: 1 / -1;
+  margin: 0;
+  overflow: hidden;
+}
+
+.c-about__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  object-position: var(--portrait-focus);
+}
+
+/* ---- Проявление второго кадра плитками ---- */
+
+.c-about__reveal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--reveal-cols), 1fr);
+  grid-template-rows: repeat(var(--reveal-rows), 1fr);
+}
+
+.c-about__reveal-block {
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+/* Плитка — окошко во второй кадр. Псевдоэлемент растянут на весь
+   контейнер и сдвинут так, чтобы в окошко попал нужный фрагмент:
+   background-size/position те же, что у основного img, поэтому оба
+   снимка кадрированы одинаково и плитки складываются без швов. */
+.c-about__reveal-block::before {
+  content: "";
+  position: absolute;
+  width: calc(var(--reveal-cols) * 100%);
+  height: calc(var(--reveal-rows) * 100%);
+  left: calc(var(--col) * -100%);
+  top: calc(var(--row) * -100%);
+  background-image: var(--reveal-src);
+  background-size: cover;
+  background-position: var(--portrait-focus);
+}
+
+/* Под курсором открывается мгновенно, гаснет — по transition выше */
+.c-about__reveal-block.is-active {
+  opacity: 1;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-about__reveal-block {
+    transition: none;
+  }
+}
+
+/* Без мыши эффект недостижим — и display:none здесь принципиален:
+   иначе браузер всё равно скачает второй кадр ради фонов плиток. */
+@media (hover: none) {
+  .c-about__reveal {
+    display: none;
+  }
+}
+
+@include from(sm) {
+  .c-about__figure {
+    grid-column: 6 / span 5;
+  }
+}

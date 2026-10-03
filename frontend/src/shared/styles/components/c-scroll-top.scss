@@ -1,0 +1,23 @@
+@use "../abstracts" as *;
+
+.c-scroll-top {
+  position: fixed;
+  bottom: 4rem;
+  left: $gutter;
+  z-index: 100000;
+  display: flex;
+  gap: 0.5rem;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-out;
+
+  @include from(sm) {
+    left: $gutter-lg;
+  }
+
+  &.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

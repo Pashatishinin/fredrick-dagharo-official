@@ -3,105 +3,84 @@ interface Props {
 	duration?: number;
 	class?: string;
 	text?: string; // Можно передать текст пропсом или через слот
+	/**
+	 * Тег обёртки. По умолчанию <button>, но внутри <a> нужно передать "span":
+	 * интерактивный элемент внутри интерактивного — невалидная разметка,
+	 * ломает клавиатурную навигацию и скринридеры.
+	 */
+	as?: "button" | "span" | "div";
 }
 
-const { duration = 0.8, class: className, text } = Astro.props;
+const { duration = 0.8, class: className, text, as: Tag = "button" } = Astro.props;
 ---
 
-<button class={`decode-button ${className}`} data-duration={duration}>
-  <span class="decode-text uppercase">
+<Tag class:list={["c-decode", className]} data-duration={duration}>
+  <span class="c-decode__text">
     {text?.trim()}<slot />
   </span>
-</button>
+</Tag>
 
 <script>
   import { gsap } from "gsap";
 
-  const symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*?/";
+  const SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*?/";
 
-  const setupHoverAnimation = () => {
-    const buttons = document.querySelectorAll(".decode-button");
+  /** Текущая анимация каждого элемента — чтобы новое наведение гасило старую. */
+  const running = new WeakMap<HTMLElement, gsap.core.Tween>();
 
-    buttons.forEach((btn) => {
-      const textElement = btn.querySelector(".decode-text") as HTMLElement;
-      if (!textElement) return;
+  const decode = (host: HTMLElement) => {
+    const textElement = host.querySelector<HTMLElement>(".c-decode__text");
+    if (!textElement) return;
 
-      const finalWord = textElement.textContent?.trim() || "";
+    // Исходный текст запоминаем при первом наведении: дальше textContent
+    // уже перебирается анимацией, и читать его оттуда нельзя.
+    host.dataset.decodeText ??= textElement.textContent?.trim() ?? "";
+    const finalWord = host.dataset.decodeText;
+    const duration = Number.parseFloat(host.dataset.duration || "0.8");
 
-      const duration = parseFloat(btn.getAttribute("data-duration") || "0.8");
+    running.get(host)?.kill();
 
-      let animation: gsap.core.Tween | null = null;
+    const state = { value: 0 };
 
-      btn.addEventListener("mouseenter", () => {
-        if (animation) animation.kill();
+    running.set(
+      host,
+      gsap.to(state, {
+        value: finalWord.length,
+        duration,
+        ease: "none",
+        onUpdate: () => {
+          const decoded = Math.floor(state.value);
 
-        let obj = { value: 0 };
-
-        animation = gsap.to(obj, {
-          value: finalWord.length,
-          duration: duration,
-          ease: "none",
-          onUpdate: () => {
-            // const currentLen = Math.floor(obj.value);
-            // const randomPart = Array(finalWord.length - currentLen)
-            //   .fill(0)
-            //   .map(() => symbols[Math.floor(Math.random() * symbols.length)])
-            //   .join("");
-
-            // textElement.textContent =
-            //   finalWord.substring(0, currentLen) + randomPart;
-            const currentLen = Math.floor(obj.value);
-
-            // Создаем массив из символов финального слова
-            const result = finalWord
-              .split("")
-              .map((char, index) => {
-                if (index < currentLen) return char; // Уже "декодированная" часть
-                if (char === " ") return " "; // Сохраняем пробелы на своих местах!
-                return symbols[Math.floor(Math.random() * symbols.length)];
-              })
-              .join("");
-
-            textElement.textContent = result;
-          },
-          onComplete: () => {
-            textElement.textContent = finalWord;
-          },
-        });
-      });
-    });
+          textElement.textContent = finalWord
+            .split("")
+            .map((char, index) => {
+              if (index < decoded || char === " ") return char;
+              return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+            })
+            .join("");
+        },
+        onComplete: () => {
+          textElement.textContent = finalWord;
+        },
+      }),
+    );
   };
 
-  setupHoverAnimation();
-  document.addEventListener("astro:page-load", setupHoverAnimation);
+  // Один слушатель на весь документ вместо обработчика на каждом элементе.
+  //  · Модуль выполняется один раз за жизнь вкладки, поэтому переходы через
+  //    ClientRouter больше не навешивают дубли — раньше на шапке и кнопке
+  //    TOP (они переживают переход) обработчики множились с каждой страницей.
+  //  · Элемент ищется в момент наведения, поэтому работает и с разметкой,
+  //    которую уже после загрузки перестроил SplitText в TextEffect.
+  document.addEventListener("mouseover", (event) => {
+    const host = (event.target as Element | null)?.closest<HTMLElement>(".c-decode");
+    if (!host) return;
+
+    // mouseover всплывает и с дочерних узлов — запускаем только на входе
+    // в элемент снаружи, как это делал mouseenter.
+    const from = event.relatedTarget as Node | null;
+    if (from && host.contains(from)) return;
+
+    decode(host);
+  });
 </script>
-
-<style>
-  .decode-button {
-    cursor: pointer;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    line-height: 1;
-    color: #f9f9f9;
-    transition: color 0.2s ease;
-    text-align: left;
-    padding: 0;
-    border: none;
-  }
-
-  .decode-text {
-    display: inline-block;
-    font-family: "Space Grotesk", sans-serif;
-
-    font-kerning: none;
-    text-rendering: optimizeSpeed;
-
-    font-variant-numeric: tabular-nums;
-  }
-
-  .decode-button:hover {
-    color: #c0c0c0;
-  }
-</style>

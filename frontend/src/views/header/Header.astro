@@ -1,49 +1,41 @@
 ---
-import { callSafely } from "astro:actions";
 import DecodeText from "../../components/animations/DecodeText.astro";
 import Clock from "../../components/common/Clock.astro";
-import { fetchHomeData } from "../../shared/fetch";
+import Logo from "../../components/common/Logo.astro";
+import { fetchSiteSettings } from "../../entities";
+import { NAVIGATION } from "../../shared/config/navigation";
 
-const { categories } = await fetchHomeData();
-const contact = [
-	{ url: "/index", label: "ARCHIVE" },
-	{ url: "/", label: "SELECTED FILMS" },
-];
+const { logo, logoImage } = await fetchSiteSettings();
 
 const pathname = new URL(Astro.request.url).pathname;
-const isHome = pathname === "/" || pathname === "/index.html";
 ---
 
-<header
-  class="header fixed w-full px-4 sm:px-16 py-4 top-0 z-9999 max-w-480 pointer-events-none"
->
-  <div class="relative flex justify-between flex-row-reverse sm:flex-row">
-    <div class="pointer-events-auto">
-      <a href="/" id="logo-link" class:list={[{ "is-home": isHome }]}>
-        <h5 class="font-bold text-xl tracking-tighter leading-[90%]">
-          FREDRICK
-        </h5>
-        <h5 class="font-bold text-xl tracking-tighter leading-[90%]">
-          DAGHARO
-        </h5>
+<header class="c-header">
+  <div class="c-header__inner">
+    <div class="c-header__logo">
+      <a href="/" id="logo-link" aria-label={logo.join(" ")}>
+        <Logo
+          lines={logo}
+          image={logoImage}
+          lineClass="c-header__logo-line"
+          imageClass="c-header__logo-image"
+        />
       </a>
     </div>
 
-    <ul class="flex gap-2 sm:gap-8 flex-col sm:flex-row">
+    <ul class="c-header__nav">
       {
-        contact.map((link) => {
-          const isActive = pathname === link.url || pathname === link.url + "/";
+        NAVIGATION.map((link) => {
+          const isCurrent =
+            pathname === link.url || pathname === `${link.url}/`;
 
           return (
             <li>
               <a
-                href={isActive ? "javascript:void(0)" : link.url}
-                class:list={[{ "pointer-events-auto": !isActive, "pointer-events-none opacity-40": isActive }]}
+                href={isCurrent ? "javascript:void(0)" : link.url}
+                class:list={["c-header__link", { "is-current": isCurrent }]}
               >
-                <DecodeText
-                  duration={1}
-                  class="my-custom-style text-[12px] sm:text-[14px]"
-                >
+                <DecodeText as="span" duration={1}>
                   {link.label}
                 </DecodeText>
               </a>
@@ -52,41 +44,17 @@ const isHome = pathname === "/" || pathname === "/index.html";
         })
       }
     </ul>
-    <div class="text-[10px] font-medium hidden sm:block">
+
+    <div class="c-header__clock">
       <Clock />
     </div>
   </div>
 </header>
 
-<style>
-  header {
-    z-index: 99999;
-    mix-blend-mode: difference;
-  }
-</style>
-
 <script>
-  import { gsap } from "gsap";
-  import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
+  import { initLogoScroll } from "../../shared/lib/logo-scroll";
 
-  gsap.registerPlugin(ScrollToPlugin);
-
-  function setupLogoScroll() {
-    const logo = document.getElementById("logo-link");
-    if (!logo) return;
-
-    const isHome =
-      window.location.pathname === "/" ||
-      window.location.pathname === "/index.html";
-
-    logo.onclick = (e) => {
-      if (isHome) {
-        e.preventDefault();
-        gsap.to(window, { duration: 1.2, scrollTo: 0, ease: "power4.inOut" });
-      }
-    };
-  }
-
-  // Запуск при первой загрузке и при смене страниц (Astro View Transitions)
-  document.addEventListener("astro:page-load", setupLogoScroll);
+  document.addEventListener("astro:page-load", () =>
+    initLogoScroll(document.querySelector<HTMLAnchorElement>("#logo-link")),
+  );
 </script>

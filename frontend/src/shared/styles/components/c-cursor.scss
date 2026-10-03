@@ -1,0 +1,29 @@
+@use "../abstracts" as *;
+
+.c-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+
+  // Курсор — вещь только для мыши.
+  @media (max-width: 700px) {
+    display: none;
+  }
+}
+
+.c-cursor__label {
+  position: absolute;
+  font-family: monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: $color-text;
+  opacity: 0;
+}

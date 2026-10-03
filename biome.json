@@ -40,11 +40,17 @@
 	},
 	"overrides": [
 		{
-			"includes": ["*.astro"],
+			"includes": ["**/*.astro"],
 			"linter": {
 				"rules": {
 					"style": {
-						"useSelfClosingElements": "off"
+						"useSelfClosingElements": "off",
+						"useConst": "off",
+						"useImportType": "off"
+					},
+					"correctness": {
+						"noUnusedVariables": "off",
+						"noUnusedImports": "off"
 					}
 				}
 			}

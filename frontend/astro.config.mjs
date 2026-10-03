@@ -12,6 +12,12 @@ const { PUBLIC_SANITY_PROJECT_ID, PUBLIC_SANITY_DATASET, PUBLIC_SANITY_API_VERSI
 
 // https://astro.build/config
 export default defineConfig({
+	// /studio ведёт в задеплоенную Sanity Studio. На статической сборке
+	// Astro создаёт страницу с мгновенным переходом (meta refresh) и
+	// noindex — поисковики её не проиндексируют.
+	redirects: {
+		"/studio": "https://fredrick-dagharo.sanity.studio/",
+	},
 	vite: {
 		server: {
 			fs: {
